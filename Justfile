@@ -12,3 +12,19 @@ run:
 [private]
 alias r := run
 
+# runs check with ruff
+check:
+    uvx ruff check src/*.py
+
+[private]
+alias c := check
+alias chk := check
+
+# runs format with ruff
+format:
+    uvx ruff format src/*.py
+
+[private]
+alias f := format
+alias fmt := format
+
