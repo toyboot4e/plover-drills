@@ -1,14 +1,22 @@
 from pathlib import Path
 
 import plover
+from plover import system
 
 from plover.dictionary.base import load_dictionary
+from plover.dictionary.json_dict import JsonDictionary
+from plover.registry import registry
+
+registry.update()
+
+# TODO: setup other system?
+system.setup("English Stenotype")
 
 
 def demo_lookup(dict_path: Path):
     print(f"loading dictionary at `{dict_path}`")
-    dictionary = load_dictionary(str(dict_path))
-    print(dictionary)
+    dict: JsonDictionary = load_dictionary(str(dict_path))
+    print(dict)
 
 
 def main():
