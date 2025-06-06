@@ -14,7 +14,7 @@ alias r := run
 
 # runs check with ruff
 check:
-    uvx ruff check src/*.py
+    uvx ruff check --fix src/*.py
 
 [private]
 alias c := check
