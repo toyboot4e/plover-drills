@@ -17,6 +17,8 @@ def demo_lookup(dict_path: Path):
     print(f"loading dictionary at `{dict_path}`")
     dict: JsonDictionary = load_dictionary(str(dict_path))
     print(dict)
+    print(dict.reverse_lookup("cat"))
+    # => {('KAT',)}
 
 
 def main():
