@@ -8,15 +8,15 @@ help:
 # runs `plover-drills`
 [positional-arguments]
 run *args:
-    uv run src/main.py "$@"
+    uv run drill/main.py "$@"
 
 [private]
 alias r := run
 
 # runs check with ruff
 check:
-    uvx ruff format src/*.py
-    uvx ruff check --fix src/*.py
+    uvx ruff format drill/*.py
+    uvx ruff check --fix drill/*.py
     uvx pyright
 
 [private]
@@ -25,8 +25,8 @@ alias chk := check
 
 # runs format with ruff
 format:
-    uvx ruff format src/*.py
-    uvx ruff check --fix src/*.py
+    uvx ruff format drill/*.py
+    uvx ruff check --fix drill/*.py
 
 [private]
 alias f := format
