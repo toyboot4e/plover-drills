@@ -1,3 +1,5 @@
+"""CLI for drills with specific keyboard layouts."""
+
 import sys
 from pathlib import Path
 from typing import Optional
@@ -10,6 +12,8 @@ from plover.registry import registry
 from plover.steno import Stroke
 from plover.steno_dictionary import StenoDictionary
 
+from drill.types import Outline, StrokeText, Translation
+
 # TODO: Update only required cmponents?
 registry.update()
 
@@ -19,19 +23,11 @@ system.setup("English Stenotype")
 # TODO: Use some logger.
 
 
-# Text created from steno outline.
-type Translation = str
-
-type StrokeText = str
-
-# A series of strokes performed in succession.
-# https://plover.readthedocs.io/en/latest/api/steno.html#steno-notation
-type Outline = tuple[StrokeText, ...]
-
-
-# See: https://plover.readthedocs.io/en/latest/dict_formats.html
 def select_outline(dict: StenoDictionary, target_translation: str) -> Optional[Outline]:
-    "Selects the most reasonable steno outline for producing the translation."
+    """Selects the most reasonable steno outline for producing the translation.
+
+    See: https://plover.readthedocs.io/en/latest/dict_formats.html
+    """
     stroke_outlines: list[Outline] = dict.reverse_lookup(target_translation)
 
     if len(stroke_outlines) == 0:
