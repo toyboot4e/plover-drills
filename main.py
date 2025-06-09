@@ -20,6 +20,7 @@ from drill.types import Outline, StrokeText, Translation
 # TODO: Use some logger.
 
 
+# TODO: use Suggestion
 def select_outline(dict: StenoDictionary, target_translation: str) -> Optional[Outline]:
     """Selects the most reasonable steno outline for producing the translation.
 
