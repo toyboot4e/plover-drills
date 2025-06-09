@@ -6,8 +6,10 @@ from typing import Optional
 
 import plover
 from plover import system
+from plover.config import Config
 from plover.dictionary.base import load_dictionary
 from plover.dictionary.json_dict import JsonDictionary
+from plover.oslayer.config import CONFIG_FILE
 from plover.registry import registry
 from plover.steno import Stroke
 from plover.steno_dictionary import StenoDictionary, StenoDictionaryCollection
@@ -51,21 +53,35 @@ def run_lesson(system_name: str):
 
 
 def main():
+    # FIXME: It does not detect plugins installed with `plover-flake`
     registry.update()
     print(f"Plover version: {plover.__version__}")
+    # print(f"Plugins: {}")
 
     # TODO: get available system names
     system_plugins = registry.list_plugins("system")
     system_names = [plugin.name for plugin in system_plugins]
     print(f"available systems: {system_names}")
 
-    # select system
-    system_name = system_names[0]
+    # Load the configuration
+    print(f"config path: {CONFIG_FILE}")
+    config = Config(CONFIG_FILE)
+    config.load()
+    # print(config.as_dict())
 
-    # setup system
+    # Load the default system defined in user configuration
+    # print(f"system name: {config["system_name"]}")
+
+    # Setup system
+    system_name = system_names[0]
+    # TODO: use `config["system_name"]`)
     system.setup(system_name)
 
-    # load dictionaries
+    # Load dictionaries
+    enabled_dictionaries = [
+        dict_config for dict_config in config["dictionaries"] if dict_config.enabled
+    ]
+    print(f"enabled dictionaries: {enabled_dictionaries}")
     dicts: list[StenoDictionary] = list(
         map(
             lambda d: load_dictionary(str(Path(system.DICTIONARIES_ROOT) / d)),
