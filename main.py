@@ -10,15 +10,10 @@ from plover.dictionary.base import load_dictionary
 from plover.dictionary.json_dict import JsonDictionary
 from plover.registry import registry
 from plover.steno import Stroke
-from plover.steno_dictionary import StenoDictionary
+from plover.steno_dictionary import StenoDictionary, StenoDictionaryCollection
 
+import drill.layout as layout
 from drill.types import Outline, StrokeText, Translation
-
-# TODO: Update only required cmponents?
-registry.update()
-
-# TODO: What is the 'system'?
-system.setup("English Stenotype")
 
 # TODO: Use some logger.
 
@@ -38,9 +33,7 @@ def select_outline(dict: StenoDictionary, target_translation: str) -> Optional[O
     return outline
 
 
-def run_lookup(dict_path: Path, target_translation: str):
-    dict: JsonDictionary = load_dictionary(str(dict_path))
-
+def run_lookup(dict: StenoDictionaryCollection, target_translation: str):
     outline: Optional[Outline] = select_outline(dict, target_translation)
     if outline is None:
         print("cannot find outline")
@@ -48,17 +41,41 @@ def run_lookup(dict_path: Path, target_translation: str):
 
     for stroke_str in outline:
         stroke: Stroke = Stroke.from_steno(stroke_str)
-        print(stroke.steno_keys)
+        # print(stroke.steno_keys)
+        print(layout.show_stroke(stroke))
 
 
-def default_dict_path() -> Path:
-    return Path.home() / ".config/plover/main.json"
+def run_lesson(system_name: str):
+    system.setup("English Stenotype")
+    pass
 
 
 def main():
+    registry.update()
     print(f"Plover version: {plover.__version__}")
-    dict_path: Path = default_dict_path()
-    run_lookup(dict_path, sys.argv[1])
+
+    # TODO: get available system names
+    system_plugins = registry.list_plugins("system")
+    system_names = [plugin.name for plugin in system_plugins]
+    print(f"available systems: {system_names}")
+
+    # select system
+    system_name = system_names[0]
+
+    # setup system
+    system.setup(system_name)
+
+    # load dictionaries
+    dicts: list[StenoDictionary] = list(
+        map(
+            lambda d: load_dictionary(str(Path(system.DICTIONARIES_ROOT) / d)),
+            system.DEFAULT_DICTIONARIES,
+        )
+    )
+    dict: StenoDictionaryCollection = StenoDictionaryCollection(dicts)
+
+    # run
+    run_lookup(dict, sys.argv[1])
 
 
 if __name__ == "__main__":
