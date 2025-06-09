@@ -1,5 +1,6 @@
 from abc import ABCMeta, abstractmethod
 from copy import deepcopy
+from enum import Enum
 from typing import Optional
 
 from colorama import Back, Fore, Style
@@ -33,7 +34,7 @@ def collect_stroke_keys(stroke: Stroke) -> tuple[str, str, str]:
         else:
             # other
             c.append(key)
-        return [l, c, r]
+    return [l, c, r]
 
 
 class LayoutInfo:
@@ -41,11 +42,26 @@ class LayoutInfo:
         self.rows = rows
         self.center = center
 
-    def show_stroke(self, stroke: Stroke) -> list[str]:
-        rows = deepcopy(self.rows)
-        return rows
+    def show_colored_stroke(self, stroke: Stroke) -> list[str]:
+        stroke_keys: tuple[str, str, str] = collect_stroke_keys(stroke)
+
+        def process_row(row: str):
+            def process_char(ic: tuple[int, str]):
+                i, c = ic
+                i_stroke: int = 0 if i < self.center else 1 if i == self.center else 2
+                if c in stroke_keys[i_stroke]:
+                    # contained in the strke
+                    return Fore.RED + c + Fore.RESET
+                else:
+                    # not contained in the strke
+                    return c
+
+            return "".join(map(process_char, enumerate(row)))
+
+        return list(map(process_row, self.rows))
 
 
+# TODO: allow arbitrary case for input
 lapwing_rows: list[str] = [
     # 0123456789
     "#TPH*FPLTD",
@@ -56,11 +72,6 @@ lapwing_rows: list[str] = [
 lapwing = LayoutInfo(lapwing_rows, lapwing_rows[0].index("*"))
 
 
-def show_stroke(stroke: Stroke) -> str:
-    l, c, r = collect_stroke_keys(stroke)
-    rows: list[str] = lapwing.show_stroke(stroke)
-    # TODO: string builder
-    out = ""
-    for row in rows:
-        print(Fore.RED + row, end="")
-    return ""
+# TODO: show numbers
+def show_colored_stroke(stroke: Stroke) -> list[str]:
+    return lapwing.show_colored_stroke(stroke)

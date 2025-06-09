@@ -38,17 +38,40 @@ def select_outline(dict: StenoDictionary, target_translation: str) -> Optional[O
 def run_lookup(dict: StenoDictionaryCollection, target_translation: str):
     outline: Optional[Outline] = select_outline(dict, target_translation)
     if outline is None:
-        print("cannot find outline")
         return
 
-    for stroke_str in outline:
-        stroke: Stroke = Stroke.from_steno(stroke_str)
-        # print(stroke.steno_keys)
-        print(layout.show_stroke(stroke))
+    outline_strings: list[list[str]] = map(
+        lambda s: layout.show_colored_stroke(Stroke.from_steno(s)), outline
+    )
+
+    print(outline)
+    concatenated_rows = ["    ".join(rows) for rows in zip(*outline_strings)]
+    for row in concatenated_rows:
+        print(row)
 
 
 def run_lesson(system_name: str):
-    system.setup("English Stenotype")
+    # Load the default system defined in user configuration
+    # print(f"system name: {config["system_name"]}")
+
+    # Setup system
+    system_name = config["system_name"]
+    print(f"system name: {system_name}")
+    system.setup(system_name)
+
+    # Load dictionaries
+    enabled_dictionaries = [
+        dict_config for dict_config in config["dictionaries"] if dict_config.enabled
+    ]
+    print(f"enabled dictionaries: {enabled_dictionaries}")
+    dicts: list[StenoDictionary] = list(
+        map(
+            lambda d: load_dictionary(str(Path(system.DICTIONARIES_ROOT) / d)),
+            system.DEFAULT_DICTIONARIES,
+        )
+    )
+    dict: StenoDictionaryCollection = StenoDictionaryCollection(dicts)
+
     pass
 
 
@@ -69,26 +92,12 @@ def main():
     config.load()
     # print(config.as_dict())
 
-    # Load the default system defined in user configuration
-    # print(f"system name: {config["system_name"]}")
+    # run_lesson
 
-    # Setup system
-    system_name = system_names[0]
-    # TODO: use `config["system_name"]`)
-    system.setup(system_name)
-
-    # Load dictionaries
-    enabled_dictionaries = [
-        dict_config for dict_config in config["dictionaries"] if dict_config.enabled
-    ]
-    print(f"enabled dictionaries: {enabled_dictionaries}")
-    dicts: list[StenoDictionary] = list(
-        map(
-            lambda d: load_dictionary(str(Path(system.DICTIONARIES_ROOT) / d)),
-            system.DEFAULT_DICTIONARIES,
-        )
-    )
-    dict: StenoDictionaryCollection = StenoDictionaryCollection(dicts)
+    # FIXME: plover-flake registry
+    system.setup("English Stenotype")
+    dict = load_dictionary(str(Path.home() / ".config/plover/main.json"))
+    dict = StenoDictionaryCollection([dict])
 
     # run
     run_lookup(dict, sys.argv[1])
