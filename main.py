@@ -75,7 +75,8 @@ def run_lesson(system_name: str):
     pass
 
 
-def main():
+# FIXME: be ready with plugins installed with `plover_flake`
+def not_main():
     # FIXME: It does not detect plugins installed with `plover-flake`
     registry.update()
     print(f"Plover version: {plover.__version__}")
@@ -92,7 +93,13 @@ def main():
     config.load()
     # print(config.as_dict())
 
-    # run_lesson
+    system_name: str = config["system_name"]
+    print(f"system name: {system_name}")
+    run_lesson(system_name)
+
+
+def main():
+    registry.update()
 
     # FIXME: plover-flake registry
     system.setup("English Stenotype")
