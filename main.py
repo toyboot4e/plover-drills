@@ -6,7 +6,7 @@ from typing import Optional
 
 import plover
 from plover import system
-from plover.config import Config
+from plover.config import Config, DictionaryConfig
 from plover.dictionary.base import load_dictionary
 from plover.dictionary.json_dict import JsonDictionary
 from plover.oslayer.config import CONFIG_DIR, CONFIG_FILE
@@ -51,37 +51,36 @@ def run_lookup(dict: StenoDictionaryCollection, target_translation: str):
         print(row)
 
 
-def run_lesson(system_name: str):
+def run_lesson(config: Config, system_name: str):
     # Load the default system defined in user configuration
     # print(f"system name: {config["system_name"]}")
 
     # Setup system
-    system_name = config["system_name"]
-    print(f"system name: {system_name}")
     system.setup(system_name)
 
     # Load dictionaries
-    enabled_dictionaries = [
+    enabled_dictionaries: list[DictionaryConfig] = [
         dict_config for dict_config in config["dictionaries"] if dict_config.enabled
     ]
     print(f"enabled dictionaries: {enabled_dictionaries}")
+
+    # FIXME: It shows errors?
     dicts: list[StenoDictionary] = list(
         map(
-            lambda d: load_dictionary(str(Path(system.DICTIONARIES_ROOT) / d)),
-            system.DEFAULT_DICTIONARIES,
+            lambda d: load_dictionary(d.path),
+            enabled_dictionaries,
         )
     )
     dict: StenoDictionaryCollection = StenoDictionaryCollection(dicts)
 
-    pass
+    # TODO: run
+    run_lookup(dict, "beginner")
 
 
 # FIXME: be ready with plugins installed with `plover_flake`
 def not_main():
     # FIXME: It does not detect plugins installed with `plover-flake`
     registry.update()
-    print(f"Plover version: {plover.__version__}")
-    # print(f"Plugins: {}")
 
     # TODO: get available system names
     system_plugins = registry.list_plugins("system")
@@ -92,14 +91,16 @@ def not_main():
     print(f"config path: {CONFIG_FILE}")
     config = Config(CONFIG_FILE)
     config.load()
+
     # print(config.as_dict())
 
     system_name: str = config["system_name"]
     print(f"system name: {system_name}")
-    run_lesson(system_name)
+    run_lesson(config, system_name)
 
 
 def main():
+    """Tests English Stenoword"""
     registry.update()
 
     # FIXME: plover-flake registry
@@ -112,4 +113,5 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    # main()
+    not_main()
