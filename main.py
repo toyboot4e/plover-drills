@@ -9,7 +9,7 @@ from plover import system
 from plover.config import Config
 from plover.dictionary.base import load_dictionary
 from plover.dictionary.json_dict import JsonDictionary
-from plover.oslayer.config import CONFIG_FILE
+from plover.oslayer.config import CONFIG_DIR, CONFIG_FILE
 from plover.registry import registry
 from plover.steno import Stroke
 from plover.steno_dictionary import StenoDictionary, StenoDictionaryCollection
@@ -104,7 +104,7 @@ def main():
 
     # FIXME: plover-flake registry
     system.setup("English Stenotype")
-    dict = load_dictionary(str(Path.home() / ".config/plover/main.json"))
+    dict = load_dictionary(str(Path(CONFIG_DIR) / "main.json"))
     dict = StenoDictionaryCollection([dict])
 
     # run
