@@ -41,15 +41,18 @@ def select_outline(dict: StenoDictionary, target_translation: str) -> Optional[O
     return outline
 
 
-def join_colored_outline_strokes(outline: list[list[str]]) -> str:
-    outline_strings: list[list[str]] = map(
-        lambda s: layout.show_colored_stroke(Stroke.from_steno(s)), outline
-    )
+def show_colored_stroke(s: StrokeText) -> list[str]:
+    stroke: Stroke = Stroke.from_steno(s)
+    return layout.show_colored_stroke(stroke)
+
+
+def show_colored_outline(outline: Outline) -> str:
+    outline_strings: list[list[str]] = map(show_colored_stroke, outline)
     return ["    ".join(rows) for rows in zip(*outline_strings)]
 
 
-def print_colored_outline(outline: list[list[str]]) -> str:
-    for row in join_colored_outline_strokes(outline):
+def print_colored_outline(outline: Outline) -> str:
+    for row in show_colored_outline(outline):
         print(row)
 
 
@@ -100,7 +103,8 @@ class Runner:
 
 
 class Lesson:
-    def __init__(self, data: list[tuple[str, str]]):
+    def __init__(self, data: list[tuple[str, tuple[str, ...]]]):
+        """self.data is [expected, [stroke1, stroke2, ..]]"""
         self.data = data
 
     @classmethod
@@ -114,7 +118,8 @@ class Lesson:
             for line in f:
                 if not is_comment(line):
                     word, outline = line.split("\t")
-                    data.append([word.strip(), outline.strip()])
+                    strokes = tuple(outline.strip().split("/"))
+                    data.append([word.strip(), strokes])
         return Lesson(data)
 
 
@@ -200,14 +205,19 @@ class LessonScreen(Screen):
     def compose(self) -> ComposeResult:
         data = self.current_lesson_data()
         if data != None:
-            expected, outline = data
+            expected, _outline = data
             yield Vertical(
                 Static("Quit with escape or Ctrl+c"),
                 Static(""),
                 Static(f"Type this: {expected}"),
                 Static(""),
                 Input(placeholder="Type your message...", id="input_prompt"),
-                Static("", id="reaction_text"),
+                # Allow ANSI color code with `markup=False`
+                Static("", id="reaction_0", markup=False),
+                Static("", id="reaction_1", markup=False),
+                Static("", id="reaction_2", markup=False),
+                Static("", id="reaction_3", markup=False),
+                Static("", id="reaction_4", markup=False),
             )
         else:
             yield Vertical(
@@ -222,7 +232,8 @@ class LessonScreen(Screen):
         if data == None:
             return
 
-        user = event.value
+        # FIXME: The first word starts with whitespace, so strip
+        user = event.value.strip()
         expected, outline = data
 
         m = match_lesson_input(expected, user)
@@ -234,16 +245,15 @@ class LessonScreen(Screen):
         elif m == LessonMatch.Wrong:
             self.show_hint = True
 
+        rows = ["", "", "", "", ""]
         if self.show_hint:
-            # show correct stroke
-            reaction = f"😊 You wrote: {user}"
-            # Update the text below the input
-            reaction_widget = self.query_one("#reaction_text", Static)
-            reaction_widget.update(reaction)
-        else:
-            # show nothing
-            reaction_widget = self.query_one("#reaction_text", Static)
-            reaction_widget.update("")
+            outline_rows = show_colored_outline(outline)
+            for i, row in enumerate(outline_rows):
+                # offset
+                rows[i] = "  " + row
+
+        for i, row in enumerate(rows):
+            self.query_one(f"#reaction_{i}", Static).update(row)
 
     # async def on_input_submitted(self, event: Input.Submitted) -> None:
 

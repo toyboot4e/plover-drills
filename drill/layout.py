@@ -55,7 +55,8 @@ class LayoutInfo:
                     # not contained in the strke
                     return c
 
-            return "".join(map(process_char, enumerate(row)))
+            # TODO: match default color to Textual
+            return Fore.RESET + "".join(map(process_char, enumerate(row)))
 
         return list(map(process_row, self.rows))
 
