@@ -1,6 +1,5 @@
 from abc import ABCMeta, abstractmethod
 from copy import deepcopy
-from enum import Enum
 from typing import Optional
 
 from colorama import Back, Fore, Style

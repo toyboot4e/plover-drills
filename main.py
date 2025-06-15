@@ -1,6 +1,7 @@
 """CLI for drills with specific keyboard layouts."""
 
 import sys
+from enum import Enum
 from pathlib import Path
 from typing import Optional
 
@@ -14,6 +15,10 @@ from plover.oslayer.config import CONFIG_DIR, CONFIG_FILE
 from plover.registry import registry
 from plover.steno import Stroke
 from plover.steno_dictionary import StenoDictionary, StenoDictionaryCollection
+from textual.app import App, ComposeResult
+from textual.containers import Vertical
+from textual.screen import Screen
+from textual.widgets import Input, Static
 from typing_extensions import Self
 
 import drill.layout as layout
@@ -113,16 +118,14 @@ class Lesson:
         return Lesson(data)
 
 
-def run_lesson(runner: Runner, lesson: Lesson):
-    # Load the default system defined in user configuration
-    print(lesson.data)
+def show_lesson(runner: Runner, lesson: Lesson):
     for word, outline in lesson.data:
         print(word)
         print_colored_outline(outline)
         print("")
 
 
-def main():
+def load_default_runner() -> Runner:
     registry.update()
 
     # Get available system names
@@ -140,15 +143,120 @@ def main():
     system_name: str = config["system_name"]
     logger.info(f"system name: {system_name}")
 
+    runner = Runner.from_config(config, system_name)
+    return runner
+
+
+def load_default_lesson() -> Lesson:
     # TODO: TUI for selecting lesson file
     path = Path("./lessons/practice/5-EU.txt")
     logger.trace(f"lesson path: {path}")
     lesson = Lesson.load_typey_type(path)
+    return lesson
 
-    # Run lesson
-    runner = Runner.from_config(config, system_name)
-    run_lesson(runner, lesson)
+
+class LessonMatch(Enum):
+    Complete = 1
+    Wip = 2
+    Wrong = 3
+
+
+def match_lesson_input(expected: str, user: str) -> LessonMatch:
+    if expected == user:
+        LessonMatch.Complete
+    elif expected.startswith(user):
+        LessonMatch.Wip
+    else:
+        return LessonMatch.Wrong
+
+
+class LessonScreen(Screen):
+    CSS = """
+    #input_prompt {
+        margin-bottom: 1;
+    }
+    """
+
+    def __init__(self, lesson: Lesson, **kwargs):
+        super().__init__(**kwargs)
+        self.lesson = lesson
+        self.current = 0
+        self.show_hint = False
+
+    def goto_next_lesson_data(self):
+        pass
+
+    def current_lesson_data(self) -> Optional[tuple[str, str]]:
+        """Returns [word, outline]"""
+        if self.current < len(self.lesson.data):
+            return self.lesson.data[self.current]
+        else:
+            return Nothing
+
+    async def on_key(self, event):
+        if event.key == "escape" or event.key == "ctrl+c":
+            self.app.exit()
+
+    def compose(self) -> ComposeResult:
+        data = self.current_lesson_data()
+        if data != None:
+            expected, outline = data
+            yield Vertical(
+                Static("Quit with escape or Ctrl+c"),
+                Static(""),
+                Static(f"Type this: {expected}"),
+                Static(""),
+                Input(placeholder="Type your message...", id="input_prompt"),
+                Static("", id="reaction_text"),
+            )
+        else:
+            yield Vertical(
+                Static("Quit with escape or Ctrl+c"),
+                Static(""),
+                Static(f"Finished!"),
+            )
+
+    async def on_input_changed(self, event: Input.Changed) -> None:
+        """Triggered on text content change"""
+        data = self.current_lesson_data()
+        if data == None:
+            return
+
+        user = event.value
+        expected, outline = data
+
+        m = match_lesson_input(expected, user)
+        if m == LessonMatch.Complete:
+            goto_next_lesson_data()
+            return
+        elif m == LessonMatch.Wip:
+            pass
+        elif m == LessonMatch.Wrong:
+            self.show_hint = True
+
+        if self.show_hint:
+            # show correct stroke
+            reaction = f"😊 You wrote: {user}"
+            # Update the text below the input
+            reaction_widget = self.query_one("#reaction_text", Static)
+            reaction_widget.update(reaction)
+        else:
+            # show nothing
+            reaction_widget = self.query_one("#reaction_text", Static)
+            reaction_widget.update("")
+
+    # async def on_input_submitted(self, event: Input.Submitted) -> None:
+
+
+class App(App):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.runner = load_default_runner()
+
+    def on_mount(self):
+        lesson = load_default_lesson()
+        self.push_screen(LessonScreen(lesson))
 
 
 if __name__ == "__main__":
-    main()
+    App().run()
