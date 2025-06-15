@@ -168,9 +168,9 @@ class LessonMatch(Enum):
 
 def match_lesson_input(expected: str, user: str) -> LessonMatch:
     if expected == user:
-        LessonMatch.Complete
+        return LessonMatch.Complete
     elif expected.startswith(user):
-        LessonMatch.Wip
+        return LessonMatch.Wip
     else:
         return LessonMatch.Wrong
 
@@ -189,7 +189,18 @@ class LessonScreen(Screen):
         self.show_hint = False
 
     def goto_next_lesson_data(self):
-        pass
+        self.show_hint = False
+        self.current += 1
+        self.query_one("#input_prompt", Input).value = ""
+        # TODO: DRY. define a reactive widget?
+        n = len(self.lesson.data)
+        data = self.current_lesson_data()
+        if data != None:
+            word, outline = data
+            self.query_one("#target_word", Static).update(f"Type this: {word}")
+            self.query_one("#numbering", Static).update(f"{self.current + 1} / {n}")
+        else:
+            self.query_one("#target_word", Static).update("Finished!")
 
     def current_lesson_data(self) -> Optional[tuple[str, str]]:
         """Returns [word, outline]"""
@@ -203,15 +214,19 @@ class LessonScreen(Screen):
             self.app.exit()
 
     def compose(self) -> ComposeResult:
+        n = len(self.lesson.data)
         data = self.current_lesson_data()
         if data != None:
-            expected, _outline = data
+            word, _outline = data
             yield Vertical(
+                # TODO: show i/n
                 Static("Quit with escape or Ctrl+c"),
                 Static(""),
-                Static(f"Type this: {expected}"),
+                Static(f"{self.current + 1} / {n}", id="numbering"),
                 Static(""),
-                Input(placeholder="Type your message...", id="input_prompt"),
+                Static(f"Type this: {word}", id="target_word"),
+                Static(""),
+                Input(placeholder="Type here...", id="input_prompt"),
                 # Allow ANSI color code with `markup=False`
                 Static("", id="reaction_0", markup=False),
                 Static("", id="reaction_1", markup=False),
@@ -222,6 +237,8 @@ class LessonScreen(Screen):
         else:
             yield Vertical(
                 Static("Quit with escape or Ctrl+c"),
+                Static(""),
+                Static(f"1 / {n}", id="numbering"),
                 Static(""),
                 Static(f"Finished!"),
             )
@@ -238,7 +255,7 @@ class LessonScreen(Screen):
 
         m = match_lesson_input(expected, user)
         if m == LessonMatch.Complete:
-            goto_next_lesson_data()
+            self.goto_next_lesson_data()
             return
         elif m == LessonMatch.Wip:
             pass
