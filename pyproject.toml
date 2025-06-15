@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "colorama>=0.4.6",
+    "loguru>=0.7.3",
     "plover>=4.0.1",
     "plover-lapwing-aio>=1.4.0",
     "pyqt5>=5.15.11",
