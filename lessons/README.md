@@ -8,7 +8,7 @@ https://github.com/aerickt/lapwing-for-beginners/tree/main/src/practice
 
 ### Typey-Type
 
-Each line is =word<TAB>outline=:
+Each line should be in format of `word<TAB>outline`:
 
 ```txt
 span	SPAPB
