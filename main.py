@@ -211,7 +211,7 @@ class LessonScreen(Screen):
 
     async def on_key(self, event):
         if event.key == "escape" or event.key == "ctrl+c":
-            self.app.exit()
+            self.app.pop_screen()
 
     def compose(self) -> ComposeResult:
         n = len(self.lesson.data)
@@ -275,14 +275,35 @@ class LessonScreen(Screen):
     # async def on_input_submitted(self, event: Input.Submitted) -> None:
 
 
+class ConfigScreen(Screen):
+    def __init__(self):
+        super().__init__()
+
+    async def on_key(self, event):
+        if event.key == "escape" or event.key == "ctrl+c":
+            self.app.exit()
+        if event.key == "enter":
+            lesson = load_default_lesson()
+            self.app.push_screen(LessonScreen(lesson))
+
+    def compose(self) -> ComposeResult:
+        yield Vertical(
+            Static("Quit with escape or Ctrl+c"),
+            Static(""),
+            Static(f"Press enter to start lesson"),
+        )
+
+    async def on_input_changed(self, event: Input.Changed) -> None:
+        pass
+
+
 class App(App):
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+        super().__init__()
         self.runner = load_default_runner()
 
     def on_mount(self):
-        lesson = load_default_lesson()
-        self.push_screen(LessonScreen(lesson))
+        self.push_screen(ConfigScreen())
 
 
 if __name__ == "__main__":
