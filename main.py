@@ -15,10 +15,12 @@ from plover.oslayer.config import CONFIG_DIR, CONFIG_FILE
 from plover.registry import registry
 from plover.steno import Stroke
 from plover.steno_dictionary import StenoDictionary, StenoDictionaryCollection
+from rich.panel import Panel
 from textual.app import App, ComposeResult
-from textual.containers import Vertical
+from textual.containers import Center, Vertical
+from textual.reactive import reactive
 from textual.screen import Screen
-from textual.widgets import Input, Static
+from textual.widgets import Footer, Header, Input, Label, ListItem, ListView, Static
 from typing_extensions import Self
 
 import drill.layout as layout
@@ -175,39 +177,57 @@ def match_lesson_input(expected: str, user: str) -> LessonMatch:
         return LessonMatch.Wrong
 
 
+class StrokeHint(Static):
+    """Widget for displaying stroke hints."""
+
+    rows: reactive[list[str]] = reactive(["" for i in range(5)], recompose=True)
+
+    def __init__(self):
+        super().__init__()
+
+    def compose(self) -> ComposeResult:
+        for row in self.rows:
+            yield Static(row, markup=False)
+
+    def clear(self):
+        self.rows = ["" for i in range(len(self.rows))]
+
+    def update(self, rows: list[list[str]]):
+        self.rows = rows
+
+
 class LessonScreen(Screen):
+    current_index: reactive[int] = reactive(0)
+
     CSS = """
     #input_prompt {
         margin-bottom: 1;
     }
     """
 
-    def __init__(self, lesson: Lesson, **kwargs):
-        super().__init__(**kwargs)
+    BINDINGS = [
+        ("escape", "app.pop_screen", "pop screen"),
+        ("ctrl+c", "app.pop_screen", "pop screen"),
+    ]
+
+    def __init__(self, lesson: Lesson):
+        super().__init__()
         self.lesson = lesson
-        self.current = 0
         self.show_hint = False
+        self.stroke_hint = StrokeHint()
 
     def goto_next_lesson_data(self):
         self.show_hint = False
-        self.current += 1
+        self.current_index += 1
+        self.stroke_hint.clear()
         self.query_one("#input_prompt", Input).value = ""
-        # TODO: DRY. define a reactive widget?
-        n = len(self.lesson.data)
-        data = self.current_lesson_data()
-        if data != None:
-            word, outline = data
-            self.query_one("#target_word", Static).update(f"Type this: {word}")
-            self.query_one("#numbering", Static).update(f"{self.current + 1} / {n}")
-        else:
-            self.query_one("#target_word", Static).update("Finished!")
 
-    def current_lesson_data(self) -> Optional[tuple[str, str]]:
+    def current_target(self) -> Optional[tuple[str, str]]:
         """Returns [word, outline]"""
-        if self.current < len(self.lesson.data):
-            return self.lesson.data[self.current]
+        if self.current_index < len(self.lesson.data):
+            return self.lesson.data[self.current_index]
         else:
-            return Nothing
+            return None
 
     async def on_key(self, event):
         if event.key == "escape" or event.key == "ctrl+c":
@@ -215,43 +235,56 @@ class LessonScreen(Screen):
 
     def compose(self) -> ComposeResult:
         n = len(self.lesson.data)
-        data = self.current_lesson_data()
-        if data != None:
-            word, _outline = data
+        target = self.current_target()
+        if target is not None:
+            word, _outline = target
             yield Vertical(
                 # TODO: show i/n
+                Header(),
                 Static("Quit with escape or Ctrl+c"),
                 Static(""),
-                Static(f"{self.current + 1} / {n}", id="numbering"),
+                Static(f"{self.current_index + 1} / {n}", id="numbering"),
                 Static(""),
-                Static(f"Type this: {word}", id="target_word"),
+                Static(f"Type this: {word}", id="word"),
                 Static(""),
                 Input(placeholder="Type here...", id="input_prompt"),
                 # Allow ANSI color code with `markup=False`
-                Static("", id="reaction_0", markup=False),
-                Static("", id="reaction_1", markup=False),
-                Static("", id="reaction_2", markup=False),
-                Static("", id="reaction_3", markup=False),
-                Static("", id="reaction_4", markup=False),
+                self.stroke_hint,
+                Footer(),
             )
         else:
             yield Vertical(
+                Header(),
                 Static("Quit with escape or Ctrl+c"),
                 Static(""),
                 Static(f"1 / {n}", id="numbering"),
                 Static(""),
                 Static(f"Finished!"),
+                Footer(),
             )
+
+    def watch_current_index(self, i: int) -> None:
+        if self.is_mounted:
+            # FIXME: DRY on construction and watch (maybe use data_bind?)
+            n = len(self.lesson.data)
+            if i < n:
+                word, _outline = self.current_target()
+                self.query_one("#numbering").update(f"{self.current_index + 1} / {n}")
+                self.query_one("#word").update(f"Type this: {word}")
+            else:
+                # Switch to the finish branch of `compose`
+                self.refresh(recompose=True)
 
     async def on_input_changed(self, event: Input.Changed) -> None:
         """Triggered on text content change"""
-        data = self.current_lesson_data()
-        if data == None:
+        target = self.current_target()
+        if target is None:
             return
 
-        # FIXME: The first word starts with whitespace, so strip
+        expected, outline = target
+
+        # The first word often starts with whitespace, so strip
         user = event.value.strip()
-        expected, outline = data
 
         m = match_lesson_input(expected, user)
         if m == LessonMatch.Complete:
@@ -262,15 +295,13 @@ class LessonScreen(Screen):
         elif m == LessonMatch.Wrong:
             self.show_hint = True
 
-        rows = ["", "", "", "", ""]
         if self.show_hint:
+            rows = ["" for i in range(5)]
             outline_rows = show_colored_outline(outline)
             for i, row in enumerate(outline_rows):
-                # offset
+                # with offset
                 rows[i] = "  " + row
-
-        for i, row in enumerate(rows):
-            self.query_one(f"#reaction_{i}", Static).update(row)
+            self.stroke_hint.update(rows)
 
     # async def on_input_submitted(self, event: Input.Submitted) -> None:
 
@@ -288,17 +319,21 @@ class ConfigScreen(Screen):
 
     def compose(self) -> ComposeResult:
         yield Vertical(
+            Header(),
             Static("Quit with escape or Ctrl+c"),
             Static(""),
             Static(f"Press enter to start lesson"),
+            Footer(),
         )
 
     async def on_input_changed(self, event: Input.Changed) -> None:
         pass
 
 
-class App(App):
-    def __init__(self, **kwargs):
+class PloverDrills(App):
+    TITLE = "Plover Drills"
+
+    def __init__(self):
         super().__init__()
         self.runner = load_default_runner()
 
@@ -307,4 +342,4 @@ class App(App):
 
 
 if __name__ == "__main__":
-    App().run()
+    PloverDrills().run()
