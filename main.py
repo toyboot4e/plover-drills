@@ -7,6 +7,7 @@ from typing import Optional
 
 import plover
 from loguru import logger
+from natsort import natsorted
 from plover import system
 from plover.config import Config, DictionaryConfig
 from plover.dictionary.base import load_dictionary
@@ -154,9 +155,7 @@ def load_default_runner() -> Runner:
     return runner
 
 
-def load_default_lesson() -> Lesson:
-    # TODO: TUI for selecting lesson file
-    path = Path("./lessons/practice/5-EU.txt")
+def load_lesson_file(path: Path) -> Lesson:
     logger.trace(f"lesson path: {path}")
     lesson = Lesson.load_typey_type(path)
     return lesson
@@ -239,10 +238,7 @@ class LessonScreen(Screen):
         if target is not None:
             word, _outline = target
             yield Vertical(
-                # TODO: show i/n
                 Header(),
-                Static("Quit with escape or Ctrl+c"),
-                Static(""),
                 Static(f"{self.current_index + 1} / {n}", id="numbering"),
                 Static(""),
                 Static(f"Type this: {word}", id="word"),
@@ -255,9 +251,7 @@ class LessonScreen(Screen):
         else:
             yield Vertical(
                 Header(),
-                Static("Quit with escape or Ctrl+c"),
-                Static(""),
-                Static(f"1 / {n}", id="numbering"),
+                Static(f"{n} / {n}", id="numbering"),
                 Static(""),
                 Static(f"Finished!"),
                 Footer(),
@@ -306,28 +300,83 @@ class LessonScreen(Screen):
     # async def on_input_submitted(self, event: Input.Submitted) -> None:
 
 
-class ConfigScreen(Screen):
+class SelectScreen(Screen):
+    files: [Path]
+    list_view: ListView
+
     def __init__(self):
         super().__init__()
+        self.files = natsorted([p for p in Path("lessons/practice").iterdir() if p.is_file()])
+
+    BINDINGS = [
+        ("q", "app.pop_screen", "Quit"),
+        ("enter", "select_current_file", "Start lesson"),
+        ("j", "cursor_down", "Down"),
+        ("k", "cursor_up", "Up"),
+        ("ctrl+n", "cursor_down", "Down"),
+        ("ctrl+p", "cursor_up", "Up"),
+        ("ctrl+d", "half_page_down", "Half page down"),
+        ("ctrl+u", "half_page_up", "Half page up"),
+        ("ctrl+f", "half_page_down", "Half page down"),
+        ("ctrl+b", "half_page_up", "Half page up"),
+    ]
 
     async def on_key(self, event):
         if event.key == "escape" or event.key == "ctrl+c":
             self.app.exit()
-        if event.key == "enter":
-            lesson = load_default_lesson()
-            self.app.push_screen(LessonScreen(lesson))
 
     def compose(self) -> ComposeResult:
+        self.list_view = ListView(
+            *[ListItem(Label(str(p.name))) for p in self.files],
+            id="lesson-list",
+        )
+
         yield Vertical(
             Header(),
-            Static("Quit with escape or Ctrl+c"),
-            Static(""),
-            Static(f"Press enter to start lesson"),
+            self.list_view,
             Footer(),
         )
 
-    async def on_input_changed(self, event: Input.Changed) -> None:
-        pass
+    # enter key binding
+    async def on_list_view_selected(self, event: ListView.Selected):
+        path = self.files[self.list_view.index]
+        lesson = load_lesson_file(path)
+        self.app.push_screen(LessonScreen(lesson))
+
+    def action_cursor_down(self) -> None:
+        self.list_view.action_cursor_down()
+
+    def action_cursor_up(self) -> None:
+        self.list_view.action_cursor_up()
+
+    def action_half_page_down(self) -> None:
+        delta = max(1, self.list_view.size.height // 2)
+        n = len(self.list_view.children)
+        i = min(n - 1, self.list_view.index + delta)
+        self.list_view.index = i
+
+    def action_half_page_up(self) -> None:
+        delta = max(1, self.list_view.size.height // 2)
+        i = max(0, self.list_view.index - delta)
+        self.list_view.index = i
+
+
+class ConfigScreen(Screen):
+    BINDINGS = [("q", "app.pop_screen", "Quit"), ("enter", "_on_enter", "Select lesson")]
+
+    def __init__(self):
+        super().__init__()
+
+    def _on_enter(self):
+        self.app.push_screen(SelectScreen())
+
+    # TODO: Select steno system etc.
+    def compose(self) -> ComposeResult:
+        yield Vertical(
+            Header(),
+            Static(f"Press enter to start lesson"),
+            Footer(),
+        )
 
 
 class PloverDrills(App):
