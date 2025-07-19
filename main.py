@@ -18,10 +18,10 @@ from plover.steno import Stroke
 from plover.steno_dictionary import StenoDictionary, StenoDictionaryCollection
 from rich.panel import Panel
 from textual.app import App, ComposeResult
-from textual.containers import Center, Vertical
+from textual.containers import Center, Horizontal, Vertical
 from textual.reactive import reactive
 from textual.screen import Screen
-from textual.widgets import Footer, Header, Input, Label, ListItem, ListView, Static
+from textual.widgets import Footer, Header, Input, Label, ListItem, ListView, ProgressBar, Static
 from typing_extensions import Self
 
 import drill.layout as layout
@@ -106,6 +106,8 @@ class Runner:
 
 
 class Lesson:
+    data: list[tuple[str, tuple[str, ...]]]
+
     def __init__(self, data: list[tuple[str, tuple[str, ...]]]):
         """self.data is [expected, [stroke1, stroke2, ..]]"""
         self.data = data
@@ -197,10 +199,20 @@ class StrokeHint(Static):
 
 class LessonScreen(Screen):
     current_index: reactive[int] = reactive(0)
+    lesson: Lesson
+    show_hint: bool
+    stroke_hint: StrokeHint
 
     CSS = """
     #input_prompt {
         margin-bottom: 1;
+    }
+    .shrink {
+        height: auto;
+    }
+    #progress_bar {
+        width: 40;
+        height: 1;
     }
     """
 
@@ -218,6 +230,7 @@ class LessonScreen(Screen):
     def goto_next_lesson_data(self):
         self.show_hint = False
         self.current_index += 1
+        self.query_one("#progress_bar", ProgressBar).advance(1)
         self.stroke_hint.clear()
         self.query_one("#input_prompt", Input).value = ""
 
@@ -240,7 +253,7 @@ class LessonScreen(Screen):
             yield Vertical(
                 Header(),
                 Static(f"{self.current_index + 1} / {n}", id="numbering"),
-                Static(""),
+                ProgressBar(total=len(self.lesson.data), id="progress_bar", show_eta=False),
                 Static(f"Type this: {word}", id="word"),
                 Static(""),
                 Input(placeholder="Type here...", id="input_prompt"),
@@ -252,6 +265,7 @@ class LessonScreen(Screen):
             yield Vertical(
                 Header(),
                 Static(f"{n} / {n}", id="numbering"),
+                ProgressBar(total=len(self.lesson.data), id="progress_bar", show_eta=False),
                 Static(""),
                 Static(f"Finished!"),
                 Footer(),
@@ -263,8 +277,8 @@ class LessonScreen(Screen):
             n = len(self.lesson.data)
             if i < n:
                 word, _outline = self.current_target()
-                self.query_one("#numbering").update(f"{self.current_index + 1} / {n}")
-                self.query_one("#word").update(f"Type this: {word}")
+                self.query_one("#numbering", Static).update(f"{self.current_index + 1} / {n}")
+                self.query_one("#word", Static).update(f"Type this: {word}")
             else:
                 # Switch to the finish branch of `compose`
                 self.refresh(recompose=True)
@@ -302,11 +316,7 @@ class LessonScreen(Screen):
 
 class SelectScreen(Screen):
     files: [Path]
-    list_view: ListView
-
-    def __init__(self):
-        super().__init__()
-        self.files = natsorted([p for p in Path("lessons/practice").iterdir() if p.is_file()])
+    list: ListView
 
     BINDINGS = [
         ("q", "app.pop_screen", "Quit"),
@@ -321,51 +331,58 @@ class SelectScreen(Screen):
         ("ctrl+b", "half_page_up", "Half page up"),
     ]
 
+    def __init__(self):
+        super().__init__()
+        self.files = natsorted([p for p in Path("lessons/practice").iterdir() if p.is_file()])
+        self.list = ListView(
+            *[ListItem(Label(str(p.name))) for p in self.files],
+            id="item-list",
+        )
+
     async def on_key(self, event):
         if event.key == "escape" or event.key == "ctrl+c":
             self.app.exit()
 
     def compose(self) -> ComposeResult:
-        self.list_view = ListView(
-            *[ListItem(Label(str(p.name))) for p in self.files],
-            id="lesson-list",
-        )
-
         yield Vertical(
             Header(),
-            self.list_view,
+            self.list,
             Footer(),
         )
 
     # enter key binding
     async def on_list_view_selected(self, event: ListView.Selected):
-        path = self.files[self.list_view.index]
+        path = self.files[self.list.index]
         lesson = load_lesson_file(path)
         self.app.push_screen(LessonScreen(lesson))
 
     def action_cursor_down(self) -> None:
-        self.list_view.action_cursor_down()
+        self.list.action_cursor_down()
 
     def action_cursor_up(self) -> None:
-        self.list_view.action_cursor_up()
+        self.list.action_cursor_up()
 
     def action_half_page_down(self) -> None:
-        delta = max(1, self.list_view.size.height // 2)
-        n = len(self.list_view.children)
-        i = min(n - 1, self.list_view.index + delta)
-        self.list_view.index = i
+        delta = max(1, self.list.size.height // 2)
+        n = len(self.list.children)
+        i = min(n - 1, self.list.index + delta)
+        self.list.index = i
 
     def action_half_page_up(self) -> None:
-        delta = max(1, self.list_view.size.height // 2)
-        i = max(0, self.list_view.index - delta)
-        self.list_view.index = i
+        delta = max(1, self.list.size.height // 2)
+        i = max(0, self.list.index - delta)
+        self.list.index = i
 
 
 class ConfigScreen(Screen):
+    list: ListView
+
     BINDINGS = [("q", "app.pop_screen", "Quit"), ("enter", "_on_enter", "Select lesson")]
 
     def __init__(self):
         super().__init__()
+        item_names = ["Steno system", "Lesson"]
+        self.list = ListView(*[ListItem(Label(p)) for p in item_names])
 
     def _on_enter(self):
         self.app.push_screen(SelectScreen())
@@ -374,7 +391,7 @@ class ConfigScreen(Screen):
     def compose(self) -> ComposeResult:
         yield Vertical(
             Header(),
-            Static(f"Press enter to start lesson"),
+            self.list,
             Footer(),
         )
 
