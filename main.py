@@ -21,7 +21,7 @@ from textual import events
 from textual.app import App, ComposeResult
 from textual.binding import Binding
 from textual.command import CommandPalette, SimpleProvider
-from textual.containers import Center, Horizontal, Vertical
+from textual.containers import Center, Horizontal, Vertical, HorizontalGroup
 from textual.reactive import reactive
 from textual.screen import Screen
 from textual.widgets import Footer, Header, Input, Label, ListItem, ListView, ProgressBar, Static
@@ -222,7 +222,7 @@ class LessonScreen(Screen):
 
     BINDINGS = [
         ("escape", "app.pop_screen", "pop screen"),
-        ("ctrl+c", "app.pop_screen", "pop screen"),
+        Binding("ctrl+c", "app.pop_screen", "pop screen", priority=True),
     ]
 
     def __init__(self, lesson: Lesson):
@@ -332,8 +332,14 @@ class ConfigScreen(Screen):
 
     def __init__(self):
         super().__init__()
-        item_names = ["Steno system", "Lesson", "Start lesson"]
-        self.list = MyListView(*[ListItem(Label(p)) for p in item_names])
+
+        items = [
+            ListItem(HorizontalGroup(Label("Steno system    "), Static("<TODO>", id="steno-system"))),
+            ListItem(HorizontalGroup(Label("Lesson file     "), Static("-", id="lesson-file"))),
+            ListItem(Label("Start lesson")),
+        ]
+
+        self.list = MyListView(*items, initial_index=1)
         self.lesson_file = None
 
     async def on_list_view_selected(self, event: ListView.Selected):
@@ -364,6 +370,7 @@ class ConfigScreen(Screen):
         # FIXME: Delete this notification, just show
         self.notify(f"Selected lesson {file}")
         self.lesson_file = Path(file)
+        self.query_one("#lesson-file", Static).update(file)
 
     # TODO: Select steno system etc.
     def compose(self) -> ComposeResult:
