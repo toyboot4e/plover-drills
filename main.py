@@ -20,8 +20,8 @@ from rich.panel import Panel
 from textual import events
 from textual.app import App, ComposeResult
 from textual.binding import Binding
-from textual.command import CommandPalette, SimpleProvider
-from textual.containers import Center, Horizontal, Vertical, HorizontalGroup
+from textual.command import CommandList, CommandPalette, SimpleProvider
+from textual.containers import Center, Horizontal, HorizontalGroup, Vertical
 from textual.reactive import reactive
 from textual.screen import Screen
 from textual.widgets import Footer, Header, Input, Label, ListItem, ListView, ProgressBar, Static
@@ -334,7 +334,9 @@ class ConfigScreen(Screen):
         super().__init__()
 
         items = [
-            ListItem(HorizontalGroup(Label("Steno system    "), Static("<default>", id="steno-system"))),
+            ListItem(
+                HorizontalGroup(Label("Steno system    "), Static("<default>", id="steno-system"))
+            ),
             ListItem(HorizontalGroup(Label("Lesson file     "), Static("-", id="lesson-file"))),
             ListItem(Label("Start lesson")),
         ]
@@ -354,12 +356,23 @@ class ConfigScreen(Screen):
                 (item, lambda item=item: self.select_lesson(item))
                 for item in map(lambda p: str(p), collect_lesson_files())
             ]
-            return self.app.push_screen(
-                MyCommandPalette(
-                    providers=[SimpleProvider(self.app.screen, commands)],
-                    placeholder="Select a lesson...",
-                )
+
+            # Set initial index
+            initial_index = 0
+            if self.lesson_file != None:
+                # FIXME: not list
+                for i, path in enumerate(collect_lesson_files()):
+                    if path == self.lesson_file:
+                        initial_index = i
+                        break
+
+            palette = MyCommandPalette(
+                initial_index,
+                providers=[SimpleProvider(self.app.screen, commands)],
+                placeholder="Select a lesson...",
             )
+
+            return self.app.push_screen(palette)
 
         elif self.list.index == 2:
             # Start lesson
