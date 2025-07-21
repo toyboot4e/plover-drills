@@ -17,7 +17,10 @@ from plover.registry import registry
 from plover.steno import Stroke
 from plover.steno_dictionary import StenoDictionary, StenoDictionaryCollection
 from rich.panel import Panel
+from textual import events
 from textual.app import App, ComposeResult
+from textual.binding import Binding
+from textual.command import CommandPalette, SimpleProvider
 from textual.containers import Center, Horizontal, Vertical
 from textual.reactive import reactive
 from textual.screen import Screen
@@ -26,6 +29,7 @@ from typing_extensions import Self
 
 import drill.layout as layout
 from drill.types import Outline, StrokeText, Translation
+from drill.widgets import MyCommandPalette, MyListView
 
 
 def select_outline(dict: StenoDictionary, target_translation: str) -> Optional[Outline]:
@@ -314,78 +318,52 @@ class LessonScreen(Screen):
     # async def on_input_submitted(self, event: Input.Submitted) -> None:
 
 
-class SelectScreen(Screen):
-    files: [Path]
-    list: ListView
+def collect_lesson_files() -> list[Path]:
+    return natsorted([p for p in Path("lessons/practice").iterdir() if p.is_file()])
+
+
+class ConfigScreen(Screen):
+    list: MyListView
+    lesson_file: Optional[Path]
 
     BINDINGS = [
-        ("q", "app.pop_screen", "Quit"),
-        ("enter", "select_current_file", "Start lesson"),
-        ("j", "cursor_down", "Down"),
-        ("k", "cursor_up", "Up"),
-        ("ctrl+n", "cursor_down", "Down"),
-        ("ctrl+p", "cursor_up", "Up"),
-        ("ctrl+d", "half_page_down", "Half page down"),
-        ("ctrl+u", "half_page_up", "Half page up"),
-        ("ctrl+f", "half_page_down", "Half page down"),
-        ("ctrl+b", "half_page_up", "Half page up"),
+        ("ctrl+c", "app.quit", "Quit"),
     ]
 
     def __init__(self):
         super().__init__()
-        self.files = natsorted([p for p in Path("lessons/practice").iterdir() if p.is_file()])
-        self.list = ListView(
-            *[ListItem(Label(str(p.name))) for p in self.files],
-            id="item-list",
-        )
+        item_names = ["Steno system", "Lesson", "Start lesson"]
+        self.list = MyListView(*[ListItem(Label(p)) for p in item_names])
+        self.lesson_file = None
 
-    async def on_key(self, event):
-        if event.key == "escape" or event.key == "ctrl+c":
-            self.app.exit()
-
-    def compose(self) -> ComposeResult:
-        yield Vertical(
-            Header(),
-            self.list,
-            Footer(),
-        )
-
-    # enter key binding
     async def on_list_view_selected(self, event: ListView.Selected):
-        path = self.files[self.list.index]
-        lesson = load_lesson_file(path)
-        self.app.push_screen(LessonScreen(lesson))
+        if self.list.index == 0:
+            # Steno system
+            pass
 
-    def action_cursor_down(self) -> None:
-        self.list.action_cursor_down()
+        elif self.list.index == 1:
+            # Lesson
+            commands = [
+                (item, lambda item=item: self.select_lesson(item))
+                for item in map(lambda p: str(p), collect_lesson_files())
+            ]
+            return self.app.push_screen(
+                MyCommandPalette(
+                    providers=[SimpleProvider(self.app.screen, commands)],
+                    placeholder="Select a lesson...",
+                )
+            )
 
-    def action_cursor_up(self) -> None:
-        self.list.action_cursor_up()
+        elif self.list.index == 2:
+            # Start lesson
+            if self.lesson_file != None:
+                lesson = load_lesson_file(self.lesson_file)
+                self.app.push_screen(LessonScreen(lesson))
 
-    def action_half_page_down(self) -> None:
-        delta = max(1, self.list.size.height // 2)
-        n = len(self.list.children)
-        i = min(n - 1, self.list.index + delta)
-        self.list.index = i
-
-    def action_half_page_up(self) -> None:
-        delta = max(1, self.list.size.height // 2)
-        i = max(0, self.list.index - delta)
-        self.list.index = i
-
-
-class ConfigScreen(Screen):
-    list: ListView
-
-    BINDINGS = [("q", "app.pop_screen", "Quit"), ("enter", "_on_enter", "Select lesson")]
-
-    def __init__(self):
-        super().__init__()
-        item_names = ["Steno system", "Lesson"]
-        self.list = ListView(*[ListItem(Label(p)) for p in item_names])
-
-    def _on_enter(self):
-        self.app.push_screen(SelectScreen())
+    def select_lesson(self, file: str):
+        # FIXME: Delete this notification, just show
+        self.notify(f"Selected lesson {file}")
+        self.lesson_file = Path(file)
 
     # TODO: Select steno system etc.
     def compose(self) -> ComposeResult:
@@ -398,6 +376,10 @@ class ConfigScreen(Screen):
 
 class PloverDrills(App):
     TITLE = "Plover Drills"
+
+    # Free ctrl+p
+    # COMMAND_PALETTE_BINDING = "f1"
+    ENABLE_COMMAND_PALETTE = False
 
     def __init__(self):
         super().__init__()
