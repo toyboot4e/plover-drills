@@ -334,7 +334,7 @@ class ConfigScreen(Screen):
         super().__init__()
 
         items = [
-            ListItem(HorizontalGroup(Label("Steno system    "), Static("<TODO>", id="steno-system"))),
+            ListItem(HorizontalGroup(Label("Steno system    "), Static("<default>", id="steno-system"))),
             ListItem(HorizontalGroup(Label("Lesson file     "), Static("-", id="lesson-file"))),
             ListItem(Label("Start lesson")),
         ]
@@ -345,6 +345,7 @@ class ConfigScreen(Screen):
     async def on_list_view_selected(self, event: ListView.Selected):
         if self.list.index == 0:
             # Steno system
+            self.notify(f"Steno system cannot be changed.")
             pass
 
         elif self.list.index == 1:
@@ -362,13 +363,13 @@ class ConfigScreen(Screen):
 
         elif self.list.index == 2:
             # Start lesson
-            if self.lesson_file != None:
+            if self.lesson_file == None:
+                self.notify(f"Select lesson.")
+            else:
                 lesson = load_lesson_file(self.lesson_file)
                 self.app.push_screen(LessonScreen(lesson))
 
     def select_lesson(self, file: str):
-        # FIXME: Delete this notification, just show
-        self.notify(f"Selected lesson {file}")
         self.lesson_file = Path(file)
         self.query_one("#lesson-file", Static).update(file)
 
