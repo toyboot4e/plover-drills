@@ -4,6 +4,7 @@ from abc import ABCMeta, abstractmethod
 from copy import deepcopy
 from typing import Optional
 
+from colorama import Fore
 from plover.steno import Stroke
 
 from .stroke import Outline
@@ -20,10 +21,10 @@ from .stroke import Outline
 #         pass
 
 
-def collect_stroke_keys(stroke: Stroke) -> tuple[str, str, str]:
-    l = ""
-    c = ""
-    r = ""
+def collect_stroke_keys(stroke: Stroke) -> tuple[list[str], list[str], list[str]]:
+    l = []
+    c = []
+    r = []
     for key in stroke.keys():
         if key[-1] == "-":
             # left hand
@@ -43,7 +44,7 @@ class LayoutInfo:
         self.center = center
 
     def show_colored_stroke(self, stroke: Stroke) -> list[str]:
-        stroke_keys: tuple[str, str, str] = collect_stroke_keys(stroke)
+        stroke_keys = collect_stroke_keys(stroke)
 
         def process_row(row: str):
             def process_char(ic: tuple[int, str]):

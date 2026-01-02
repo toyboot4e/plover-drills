@@ -6,7 +6,6 @@ from enum import Enum
 from pathlib import Path
 from typing import Optional
 
-import drill.layout as layout
 import plover
 from loguru import logger
 from natsort import natsorted
@@ -29,7 +28,8 @@ from textual.screen import Screen
 from textual.widgets import Footer, Header, Input, Label, ListItem, ListView, ProgressBar, Static
 from typing_extensions import Self
 
-from drill.types import Outline, StrokeText, Translation
+import drill.types.layout as layout
+from drill.types.stroke import Outline, StrokeText, Translation
 from drill.widgets import MyCommandPalette, MyListView
 
 
