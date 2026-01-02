@@ -1,9 +1,6 @@
-import pronouncing
-from phonecodes import phonecodes
+import eng_to_ipa as ipa
 
 
 def to_ipa(w: str) -> str:
-    arps = pronouncing.phones_for_word(w.lower())
-    if not arps:
-        return ""
-    return phonecodes.arpabet2ipa(arps[0])  # ARPAbet → IPA
+    lambda xs: " ".join(map(f, xs)).split()
+    return "".join(map(lambda s: f"/{s}/", ipa.convert(w).split()))

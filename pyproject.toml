@@ -6,12 +6,11 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "colorama>=0.4.6",
+    "eng-to-ipa>=0.0.2",
     "loguru>=0.7.3",
     "natsort>=8.4.0",
-    "phonecodes>=2.0.0",
     "plover>=5.1.0",
     "plover-lapwing-aio>=1.4.5",
-    "pronouncing>=0.2.0",
     "pyside6>=6.10.1",
     "textual>=6.12.0",
     "typing-extensions>=4.15.0",
