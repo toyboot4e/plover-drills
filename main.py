@@ -25,10 +25,12 @@ from textual.command import CommandList, CommandPalette, SimpleProvider
 from textual.containers import Center, Horizontal, HorizontalGroup, Vertical
 from textual.reactive import reactive
 from textual.screen import Screen
+from textual.widget import Widget
 from textual.widgets import Footer, Header, Input, Label, ListItem, ListView, ProgressBar, Static
 from typing_extensions import Self
 
 import drill.types.layout as layout
+import drill.utils as utils
 from drill.types.stroke import Outline, StrokeText, Translation
 from drill.widgets import MyCommandPalette, MyListView
 
@@ -111,6 +113,7 @@ class Runner:
 
 
 class Lesson:
+    # word, outline
     data: list[tuple[str, tuple[str, ...]]]
 
     def __init__(self, data: list[tuple[str, tuple[str, ...]]]):
@@ -202,6 +205,22 @@ class StrokeHint(Static):
         self.rows = rows
 
 
+# TODO: ReactiveLabel etc.
+class ReactiveTypeThis(Widget):
+    text = reactive("")
+
+    # for Vertical use
+    def on_mount(self):
+        self.styles.height = 1
+
+    def render(self) -> str:
+        # return self.text
+        return f"{self.text}"
+
+    def set_word_ipa(self, word: str, ipa: str):
+        self.text = f"Type this: {word} {ipa}"
+
+
 class LessonScreen(Screen):
     current_index: reactive[int] = reactive(0)
     lesson: Lesson
@@ -209,6 +228,7 @@ class LessonScreen(Screen):
     lesson_data_indices: list[int]
     show_hint: bool
     stroke_hint: StrokeHint
+    type_this: ReactiveTypeThis
 
     CSS = """
     #input_prompt {
@@ -238,13 +258,28 @@ class LessonScreen(Screen):
             random.shuffle(self.lesson_data_indices)
 
         self.show_hint = False
+
+        self.type_this = ReactiveTypeThis()
+        target = self.current_target()
+        if target is not None:
+            word, _ = target
+            self.type_this.set_word_ipa(word, "")
+
         self.stroke_hint = StrokeHint()
 
-    def goto_next_lesson_data(self):
+    def advance_lesson_step(self):
         self.show_hint = False
         self.current_index += 1
         self.query_one("#progress_bar", ProgressBar).advance(1)
         self.stroke_hint.clear()
+
+        target = self.current_target()
+        if target is not None:
+            word, _ = target
+            self.type_this.set_word_ipa(word, "")
+        else:
+            self.type_this.set_word_ipa("", "")
+            # U
         self.query_one("#input_prompt", Input).value = ""
 
     def current_target(self) -> Optional[tuple[str, str]]:
@@ -268,10 +303,10 @@ class LessonScreen(Screen):
             word, _outline = target
             yield Vertical(
                 Header(),
-                Static(f"{self.current_index + 1} / {n}", id="numbering"),
+                Label(f"{self.current_index + 1} / {n}", id="numbering"),
                 ProgressBar(total=len(self.lesson.data), id="progress_bar", show_eta=False),
-                Static(f"Type this: {word}", id="word"),
-                Static(""),
+                self.type_this,
+                Label(""),
                 Input(placeholder="Type here...", id="input_prompt"),
                 # Allow ANSI color code with `markup=False`
                 self.stroke_hint,
@@ -280,24 +315,12 @@ class LessonScreen(Screen):
         else:
             yield Vertical(
                 Header(),
-                Static(f"{n} / {n}", id="numbering"),
+                Label(f"{n} / {n}", id="numbering"),
                 ProgressBar(total=len(self.lesson.data), id="progress_bar", show_eta=False),
-                Static(""),
-                Static(f"Finished!"),
+                Label(""),
+                Label(f"Finished!"),
                 Footer(),
             )
-
-    def watch_current_index(self, i: int) -> None:
-        if self.is_mounted:
-            # FIXME: DRY on construction and watch (maybe use data_bind?)
-            n = len(self.lesson.data)
-            if i < n:
-                word, _outline = self.current_target()
-                self.query_one("#numbering", Static).update(f"{self.current_index + 1} / {n}")
-                self.query_one("#word", Static).update(f"Type this: {word}")
-            else:
-                # Switch to the finish branch of `compose`
-                self.refresh(recompose=True)
 
     async def on_input_changed(self, event: Input.Changed) -> None:
         """Triggered on text content change"""
@@ -312,7 +335,7 @@ class LessonScreen(Screen):
 
         m = match_lesson_input(expected, user)
         if m == LessonMatch.Complete:
-            self.goto_next_lesson_data()
+            self.advance_lesson_step()
             return
         elif m == LessonMatch.Wip:
             pass
@@ -320,6 +343,7 @@ class LessonScreen(Screen):
             self.show_hint = True
 
         if self.show_hint:
+            # update stroke hint
             rows = ["" for i in range(5)]
             outline_rows = show_colored_outline(outline)
             for i, row in enumerate(outline_rows):
@@ -327,7 +351,8 @@ class LessonScreen(Screen):
                 rows[i] = "  " + row
             self.stroke_hint.update(rows)
 
-    # async def on_input_submitted(self, event: Input.Submitted) -> None:
+            # update IPA
+            self.type_this.set_word_ipa(expected, utils.to_ipa(expected))
 
 
 def collect_lesson_files() -> list[Path]:
@@ -349,10 +374,10 @@ class ConfigScreen(Screen):
 
         items = [
             ListItem(
-                HorizontalGroup(Label("Steno system    "), Static("<default>", id="steno-system"))
+                HorizontalGroup(Label("Steno system    "), Label("<default>", id="steno-system"))
             ),
-            ListItem(HorizontalGroup(Label("Lesson file     "), Static("-", id="lesson-file"))),
-            ListItem(HorizontalGroup(Label("Shuffle lesson  "), Static("No", id="shuffle-lesson"))),
+            ListItem(HorizontalGroup(Label("Lesson file     "), Label("-", id="lesson-file"))),
+            ListItem(HorizontalGroup(Label("Shuffle lesson  "), Label("No", id="shuffle-lesson"))),
             ListItem(Label("Start lesson")),
         ]
 
@@ -393,7 +418,7 @@ class ConfigScreen(Screen):
             # Shuffle flag
             self.shuffle = not self.shuffle
             s = "Yes" if self.shuffle else "No"
-            self.query_one("#shuffle-lesson", Static).update(s)
+            self.query_one("#shuffle-lesson", Label).update(s)
 
         elif self.list.index == 3:
             # Start lesson
@@ -405,7 +430,7 @@ class ConfigScreen(Screen):
 
     def select_lesson(self, file: str):
         self.lesson_file = Path(file)
-        self.query_one("#lesson-file", Static).update(file)
+        self.query_one("#lesson-file", Label).update(file)
 
     # TODO: Select steno system etc.
     def compose(self) -> ComposeResult:
