@@ -16,6 +16,7 @@ from plover.oslayer.config import CONFIG_DIR, CONFIG_FILE
 from plover.registry import registry
 from plover.steno import Stroke
 from plover.steno_dictionary import StenoDictionary, StenoDictionaryCollection
+import random
 from rich.panel import Panel
 from textual import events
 from textual.app import App, ComposeResult
@@ -204,6 +205,8 @@ class StrokeHint(Static):
 class LessonScreen(Screen):
     current_index: reactive[int] = reactive(0)
     lesson: Lesson
+    shuffle: bool
+    lesson_data_indices: list[int]
     show_hint: bool
     stroke_hint: StrokeHint
 
@@ -225,9 +228,15 @@ class LessonScreen(Screen):
         Binding("ctrl+c", "app.pop_screen", "pop screen", priority=True),
     ]
 
-    def __init__(self, lesson: Lesson):
+    def __init__(self, lesson: Lesson, shuffle: bool):
         super().__init__()
         self.lesson = lesson
+
+        self.shuffle = shuffle
+        self.lesson_data_indices = list(range(len(self.lesson.data)))
+        if self.shuffle:
+            random.shuffle(self.lesson_data_indices)
+
         self.show_hint = False
         self.stroke_hint = StrokeHint()
 
@@ -241,7 +250,9 @@ class LessonScreen(Screen):
     def current_target(self) -> Optional[tuple[str, str]]:
         """Returns [word, outline]"""
         if self.current_index < len(self.lesson.data):
-            return self.lesson.data[self.current_index]
+            # it may be shuffled
+            i = self.lesson_data_indices[self.current_index]
+            return self.lesson.data[i]
         else:
             return None
 
@@ -249,6 +260,7 @@ class LessonScreen(Screen):
         if event.key == "escape" or event.key == "ctrl+c":
             self.app.pop_screen()
 
+    # TODO: show reverse flag as title
     def compose(self) -> ComposeResult:
         n = len(self.lesson.data)
         target = self.current_target()
@@ -322,9 +334,11 @@ def collect_lesson_files() -> list[Path]:
     return natsorted([p for p in Path("lessons/practice").iterdir() if p.is_file()])
 
 
+# TODO: I want to write it in a reactive way
 class ConfigScreen(Screen):
     list: MyListView
     lesson_file: Optional[Path]
+    shuffle: bool
 
     BINDINGS = [
         ("ctrl+c", "app.quit", "Quit"),
@@ -338,17 +352,18 @@ class ConfigScreen(Screen):
                 HorizontalGroup(Label("Steno system    "), Static("<default>", id="steno-system"))
             ),
             ListItem(HorizontalGroup(Label("Lesson file     "), Static("-", id="lesson-file"))),
+            ListItem(HorizontalGroup(Label("Shuffle lesson  "), Static("No", id="shuffle-lesson"))),
             ListItem(Label("Start lesson")),
         ]
 
         self.list = MyListView(*items, initial_index=1)
         self.lesson_file = None
+        self.shuffle = False
 
     async def on_list_view_selected(self, event: ListView.Selected):
         if self.list.index == 0:
             # Steno system
             self.notify(f"Steno system cannot be changed.")
-            pass
 
         elif self.list.index == 1:
             # Lesson
@@ -375,12 +390,18 @@ class ConfigScreen(Screen):
             return self.app.push_screen(palette)
 
         elif self.list.index == 2:
+            # Shuffle flag
+            self.shuffle = not self.shuffle
+            s = "Yes" if self.shuffle else "No"
+            self.query_one("#shuffle-lesson", Static).update(s)
+
+        elif self.list.index == 3:
             # Start lesson
             if self.lesson_file == None:
                 self.notify(f"Select lesson.")
             else:
                 lesson = load_lesson_file(self.lesson_file)
-                self.app.push_screen(LessonScreen(lesson))
+                self.app.push_screen(LessonScreen(lesson, self.shuffle))
 
     def select_lesson(self, file: str):
         self.lesson_file = Path(file)
