@@ -1,11 +1,12 @@
+"""Keyboard layout"""
+
 from abc import ABCMeta, abstractmethod
 from copy import deepcopy
 from typing import Optional
 
-from colorama import Back, Fore, Style
 from plover.steno import Stroke
 
-from .types import Outline
+from .stroke import Outline
 
 # class StrokeDisplay:
 #     pass
@@ -20,9 +21,9 @@ from .types import Outline
 
 
 def collect_stroke_keys(stroke: Stroke) -> tuple[str, str, str]:
-    l = []
-    c = []
-    r = []
+    l = ""
+    c = ""
+    r = ""
     for key in stroke.keys():
         if key[-1] == "-":
             # left hand
