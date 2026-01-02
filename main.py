@@ -1,10 +1,12 @@
 """CLI for drills with specific keyboard layouts."""
 
+import random
 import sys
 from enum import Enum
 from pathlib import Path
 from typing import Optional
 
+import drill.layout as layout
 import plover
 from loguru import logger
 from natsort import natsorted
@@ -16,7 +18,6 @@ from plover.oslayer.config import CONFIG_DIR, CONFIG_FILE
 from plover.registry import registry
 from plover.steno import Stroke
 from plover.steno_dictionary import StenoDictionary, StenoDictionaryCollection
-import random
 from rich.panel import Panel
 from textual import events
 from textual.app import App, ComposeResult
@@ -28,7 +29,6 @@ from textual.screen import Screen
 from textual.widgets import Footer, Header, Input, Label, ListItem, ListView, ProgressBar, Static
 from typing_extensions import Self
 
-import drill.layout as layout
 from drill.types import Outline, StrokeText, Translation
 from drill.widgets import MyCommandPalette, MyListView
 
