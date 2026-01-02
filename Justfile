@@ -43,3 +43,13 @@ format:
 alias f := format
 alias fmt := format
 
+watch:
+    watchexec -e py -- just check
+
+[private]
+alias w := watch
+
+# Update pyproject.toml to the latest:
+upgrade:
+    uvx uv-upx upgrade run
+
