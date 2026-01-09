@@ -18,20 +18,20 @@
       in
       {
         devShells.default =
-          with pkgs;
-          mkShell {
-            buildInputs = [
+          pkgs.mkShell {
+            buildInputs = with pkgs; [
               pkg-config
+            ] ++ pkgs.lib.optional pkgs.stdenv.isLinux [
               linuxHeaders
-            ];
+	    ];
 
-            packages = [
+            packages = with pkgs; [
               python312
               python312Packages.uv
             ];
-
-            C_INCLUDE_PATH = "${linuxHeaders}/include";
-          };
+	  } // pkgs.lib.mkIf pkgs.stdenv.isLinux {
+            C_INCLUDE_PATH = "${pkgs.linuxHeaders}/include";
+	  };
       }
     );
 }
