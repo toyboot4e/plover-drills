@@ -205,11 +205,10 @@ class StrokeHint(Static):
         self.rows = rows
 
 
-# TODO: ReactiveLabel etc.
 class ReactiveTypeThis(Widget):
     text = reactive("")
 
-    # for Vertical use
+    # TODO: calculate like a Label
     def on_mount(self):
         self.styles.height = 1
 
@@ -270,6 +269,15 @@ class LessonScreen(Screen):
     def advance_lesson_step(self):
         self.show_hint = False
         self.current_index += 1
+
+        if self.current_index >= len(self.lesson.data):
+            # FIXME
+            self.recompose()
+            return
+
+        if self.current_index == len(self.lesson.data):
+            pass
+
         self.query_one("#progress_bar", ProgressBar).advance(1)
         self.stroke_hint.clear()
 
@@ -279,8 +287,11 @@ class LessonScreen(Screen):
             self.type_this.set_word_ipa(word, "")
         else:
             self.type_this.set_word_ipa("", "")
-            # U
+
         self.query_one("#input_prompt", Input).value = ""
+        self.query_one("#numbering", Label).update(
+            f"{self.current_index + 1} / {len(self.lesson.data)}"
+        )
 
     def current_target(self) -> Optional[tuple[str, str]]:
         """Returns [word, outline]"""
