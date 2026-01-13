@@ -26,8 +26,9 @@
 	    ];
 
             packages = with pkgs; [
-              python312
-              python312Packages.uv
+              python3
+              python3Packages.uv
+              python3Packages.hid
             ];
 	  } // pkgs.lib.mkIf pkgs.stdenv.isLinux {
             C_INCLUDE_PATH = "${pkgs.linuxHeaders}/include";
