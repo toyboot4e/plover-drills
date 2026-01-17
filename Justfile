@@ -16,40 +16,13 @@ download:
 [private]
 alias dl := download
 
-# runs `plover-drills`
-[positional-arguments]
-run *args:
-    uv run main.py "$@"
+# runs the app on dev srever at localhost:5173
+dev:
+    npm run dev "$@"
 
-[private]
-alias r := run
-
-# runs check with ruff
+# runs biome check --fix
 check:
-    uvx ruff format
-    uvx ruff check --fix
-    uvx pyright
+    npm run check:fix
 
 [private]
 alias c := check
-alias chk := check
-
-# runs format with ruff
-format:
-    uvx ruff format
-    uvx ruff check --fix
-
-[private]
-alias f := format
-alias fmt := format
-
-watch:
-    watchexec -e py -- just check
-
-[private]
-alias w := watch
-
-# Update pyproject.toml to the latest:
-upgrade:
-    uvx uv-upx upgrade run
-
