@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import './App.css';
+import styles from './App.module.scss';
 
 function App() {
   const [count, setCount] = useState(0);
@@ -7,13 +7,11 @@ function App() {
   return (
     <>
       <h1>Plove Drills for Lapwing Theory</h1>
-      <div className='card'>
-        <button onClick={() => setCount((count) => count + 1)}>count is {count}</button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <footer className='read-the-docs'>
+      <textarea></textarea>
+      <p>
+        <div className={styles.editor} contentEditable placeholder='Type here'></div>
+      </p>
+      <footer className={styles.footer}>
         This is a third-party app for <a href='https://lapwing.aerick.ca/'>Lapwing for Beginners</a>. Every lesson data
         comes from the book.
       </footer>
