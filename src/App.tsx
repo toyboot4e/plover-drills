@@ -13,7 +13,10 @@ function App() {
           Edit <code>src/App.tsx</code> and save to test HMR
         </p>
       </div>
-      <p className='read-the-docs'>Click on the Vite and React logos to learn more</p>
+      <footer className='read-the-docs'>
+        This is a third-party app for <a href='https://lapwing.aerick.ca/'>Lapwing for Beginners</a>. Every lesson data
+        comes from the book.
+      </footer>
     </>
   );
 }
