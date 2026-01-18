@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import styles from './App.module.scss';
 import { type Item, LessonSelector } from './LessonSelector.tsx';
+import { ShuffleCheckbox } from './ShuffleCheckbox.tsx';
+import './theme.css';
 
 type DrillData = Array<DrillItem>;
 
@@ -41,18 +43,50 @@ const drillItems: Item[] = drills.map(({ name, drillData }, i) => {
   return { key: String(i), label: name, drillData };
 });
 
-const App = (): React.JSX.Element => {
-  const [drillData, setDrillData] = useState<DrillData | null>(null);
-  const [drillIndex, setDrillIndex] = useState(0);
-  const [didFail, setDidFail] = useState(false);
+type DrillProps = {
+  drillData: DrillData;
+};
 
-  const onValueChange = ({ drillData }, _) => {
-    setDrillData(drillData);
+const Drill = ({ drillData }): JSX.Element => {
+  const [drillItemIndex, setDrillItemIndex] = useState(0);
+  const [didFail, setDidFail] = useState(false);
+  const [isCompleted, setIsCompleted] = useState(false);
+
+  // biome-ignore lint/style/noNonNullAssertion: ignore
+  const item = drillData[drillItemIndex]!;
+  const word = item.word;
+  const accentHint = null;
+
+  return (
+    <>
+      <p>
+        [1/n] {word}
+        {accentHint}
+      </p>
+      <input className={styles.editor} placeholder='Type here' autoFocus />
+      <p>Show outline here on type error</p>
+      <footer className={styles.footer}>
+        This is a third-party app for <a href='https://lapwing.aerick.ca/'>Lapwing for Beginners</a>. Every lesson data
+        comes from the book.
+      </footer>
+    </>
+  );
+};
+
+export const App = (): React.JSX.Element => {
+  const [drillData, setDrillData] = useState<DrillData | null>(null);
+  const onValueChange = (drillItem, _) => {
+    if (drillItem === null) {
+      setDrillData(null);
+    } else {
+      setDrillData(drillItem.drillData);
+    }
   };
 
   return (
     <>
       <h1>Plove Drills for Lapwing Theory</h1>
+      <ShuffleCheckbox title='Shuffle' />
       <LessonSelector
         items={drillItems}
         placeholder='Select a drill'
@@ -60,19 +94,7 @@ const App = (): React.JSX.Element => {
         width='100%'
         onValueChange={onValueChange}
       />
-      {drillData !== null && (
-        <>
-          <p>[1/n] word [accent hint here]</p>
-          <input className={styles.editor} placeholder='Type here' autoFocus />
-          <p>Show outline here on type error</p>
-          <footer className={styles.footer}>
-            This is a third-party app for <a href='https://lapwing.aerick.ca/'>Lapwing for Beginners</a>. Every lesson
-            data comes from the book.
-          </footer>
-        </>
-      )}
+      {drillData && <Drill drillData={drillData} />}
     </>
   );
 };
-
-export default App;
