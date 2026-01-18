@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styles from './App.module.scss';
 import { MyCheckbox } from './MyCheckbox.tsx';
 import { MyCombobox, type MyComboboxItem } from './MyCombobox.tsx';
@@ -47,6 +47,17 @@ type DrillProps = {
   drillData: DrillData;
 };
 
+const useDebouncedCallback = <T extends (...args: any[]) => void>(callback: T, delay: number) => {
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  return (...args: Parameters<T>) => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    timeoutRef.current = setTimeout(() => {
+      callback(...args);
+    }, delay);
+  };
+};
+
 const Drill = ({ drillData }): JSX.Element => {
   const [text, setText] = useState('');
   const [drillItemIndex, setDrillItemIndex] = useState(0);
@@ -58,21 +69,24 @@ const Drill = ({ drillData }): JSX.Element => {
   const word = item.word;
   const accentHint = null;
 
-  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const text = e.target.value;
+  const handleDebounced = useDebouncedCallback((text: string) => {
     if (text.trim() === word) {
       setText('');
       if (drillItemIndex + 1 >= drillData.length) {
         setIsCompleted(true);
-        setDidFail(false);
       } else {
         setDrillItemIndex(drillItemIndex + 1);
         setDidFail(false);
       }
     } else {
-      setText(text);
       setDidFail(true);
     }
+  }, 100); // 100ms delay
+
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const text = e.target.value.trim();
+    setText(text);
+    handleDebounced(text);
   };
 
   if (!isCompleted) {
