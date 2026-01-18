@@ -4,8 +4,8 @@ import * as React from 'react';
 import styles from './LessonSelector.module.scss';
 
 export interface Item {
+  key: string;
   label: string;
-  value: string;
 }
 
 export type LessonSelectorProps = {
@@ -13,15 +13,25 @@ export type LessonSelectorProps = {
   placeholder: string;
   emptyString: string;
   width: string;
+  onValueChange?: (
+    value: ComboboxValueType<Value, Multiple> | (Multiple extends true ? never : null),
+    eventDetails: ComboboxRoot.ChangeEventDetails,
+  ) => void;
 };
 
 /**
  * https://base-ui.com/react/components/combobox
  */
-export const LessonSelector = ({ items, placeholder, emptyString, width }: LessonSelectorProps): React.JSX.Element => {
+export const LessonSelector = ({
+  items,
+  placeholder,
+  emptyString,
+  width,
+  onValueChange,
+}: LessonSelectorProps): React.JSX.Element => {
   const id = React.useId();
   return (
-    <Combobox.Root items={items}>
+    <Combobox.Root items={items} onValueChange={onValueChange}>
       <div className={styles.Label} style={{ width }}>
         <div className={styles.InputWrapper}>
           <Combobox.Input placeholder={placeholder} id={id} className={styles.Input} style={{ width }} />
@@ -41,8 +51,8 @@ export const LessonSelector = ({ items, placeholder, emptyString, width }: Lesso
           <Combobox.Popup className={styles.Popup}>
             <Combobox.Empty className={styles.Empty}>{emptyString}</Combobox.Empty>
             <Combobox.List className={styles.List}>
-              {(item: Item) => (
-                <Combobox.Item key={item.value} value={item} className={styles.Item}>
+              {(item) => (
+                <Combobox.Item key={item.key} value={item} className={styles.Item}>
                   <Combobox.ItemIndicator className={styles.ItemIndicator}>
                     <CheckIcon className={styles.ItemIndicatorIcon} />
                   </Combobox.ItemIndicator>

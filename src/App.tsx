@@ -1,7 +1,7 @@
 import styles from './App.module.scss';
 import { type Item, LessonSelector } from './LessonSelector.tsx';
 
-const drillFiles = import.meta.glob('../drills/*.txt', { as: 'raw', eager: true });
+const drillFiles = import.meta.glob('../drills/*.txt', { query: '?raw', eager: true });
 
 const drills = Object.entries(drillFiles)
   .map(([path, text]) => ({
@@ -12,15 +12,25 @@ const drills = Object.entries(drillFiles)
     return a.name.localeCompare(b.name, undefined, { numeric: true });
   });
 
-const items: Item[] = drills.map(({ name }) => {
-  return { label: name, value: name };
+const items: Item[] = drills.map(({ name }, i) => {
+  return { index: i, key: String(i), label: name };
 });
 
 const App = (): React.JSX.Element => {
+  const onValueChange = ({ index }, _) => {
+    console.log('->', index);
+  };
+
   return (
     <>
       <h1>Plove Drills for Lapwing Theory</h1>
-      <LessonSelector items={items} placeholder='Select drill' emptyString='No drill found' width='100%' />
+      <LessonSelector
+        items={items}
+        placeholder='Select drill'
+        emptyString='No drill found'
+        width='100%'
+        onValueChange={onValueChange}
+      />
       <p>[1/n] Type this: example [accent hint here]</p>
       <div className={styles.editor} contentEditable />
       <p>Show outline here on type error</p>
