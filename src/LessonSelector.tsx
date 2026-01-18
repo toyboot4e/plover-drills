@@ -12,18 +12,19 @@ export type LessonSelectorProps = {
   items: Array<Item>;
   placeholder: string;
   emptyString: string;
+  width: string;
 };
 
 /**
  * https://base-ui.com/react/components/combobox
  */
-export const LessonSelector = ({ items, placeholder, emptyString }: LessonSelectorProps): React.JSX.Element => {
+export const LessonSelector = ({ items, placeholder, emptyString, width }: LessonSelectorProps): React.JSX.Element => {
   const id = React.useId();
   return (
     <Combobox.Root items={items}>
-      <div className={styles.Label}>
+      <div className={styles.Label} style={{ width }}>
         <div className={styles.InputWrapper}>
-          <Combobox.Input placeholder={placeholder} id={id} className={styles.Input} />
+          <Combobox.Input placeholder={placeholder} id={id} className={styles.Input} style={{ width }} />
           <div className={styles.ActionButtons}>
             <Combobox.Clear className={styles.Clear} aria-label='Clear selection'>
               <ClearIcon className={styles.ClearIcon} />
