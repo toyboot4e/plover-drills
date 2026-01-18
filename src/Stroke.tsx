@@ -1,7 +1,7 @@
 import style from './Stroke.module.scss';
 
 // Uni V4
-const chars: Array<Array<char>> = [
+const chars: Array<Array<string>> = [
   ['#', 'T', 'P', 'H', '*', '', '*', 'F', 'P', 'L', 'T', 'D'],
   ['S', 'K', 'W', 'R', '', '', '', 'R', 'B', 'G', 'S', 'Z'],
   ['', '', '#', 'A', 'O', '', 'E', 'U', '#', '', '', ''],
@@ -45,7 +45,7 @@ const stenoOrder = [
   [1, 11],
 ];
 
-const collectKeyPress = (chars: Array<Array<char>>, stroke: string): Array<Array<boolean>> => {
+const collectKeyPress = (chars: Array<Array<string>>, stroke: string): Array<Array<boolean>> => {
   const ret = [
     Array(chars[0].length).fill(false),
     Array(chars[1].length).fill(false),

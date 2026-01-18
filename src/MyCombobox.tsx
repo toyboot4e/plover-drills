@@ -14,8 +14,8 @@ export type MyComboboxProps = {
   emptyString: string;
   width: string;
   onValueChange?: (
-    value: ComboboxValueType<Value, Multiple> | (Multiple extends true ? never : null),
-    eventDetails: ComboboxRoot.ChangeEventDetails,
+    value: MyComboboxItem[] | MyComboboxItem | any | null,
+    eventDetails: Combobox.Root.ChangeEventDetails,
   ) => void;
 };
 
@@ -28,7 +28,7 @@ export const MyCombobox = ({
   emptyString,
   width,
   onValueChange,
-}: ComboboxProps): React.JSX.Element => {
+}: MyComboboxProps): React.JSX.Element => {
   const id = React.useId();
   return (
     <Combobox.Root items={items} onValueChange={onValueChange}>
