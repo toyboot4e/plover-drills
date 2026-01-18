@@ -61,28 +61,39 @@ const Drill = ({ drillData }): JSX.Element => {
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const text = e.target.value;
     if (text.trim() === word) {
-      console.log('match');
-      setText(''); // clear input
-      setDrillItemIndex(drillItemIndex + 1);
+      setText('');
+      if (drillItemIndex + 1 >= drillData.length) {
+        setIsCompleted(true);
+      } else {
+        setDrillItemIndex(drillItemIndex + 1);
+      }
     } else {
       setText(text);
     }
   };
 
-  return (
-    <>
-      <p>
-        [{drillItemIndex + 1} / {drillData.length}] {word}
-        {accentHint}
-      </p>
-      <input className={styles.editor} value={text} placeholder='Type here' autoFocus onChange={onChange} />
-      <p>Show outline here on type error</p>
-      <footer className={styles.footer}>
-        This is a third-party app for <a href='https://lapwing.aerick.ca/'>Lapwing for Beginners</a>. Every lesson data
-        comes from the book.
-      </footer>
-    </>
-  );
+  if (!isCompleted) {
+    return (
+      <>
+        <p>
+          [{drillItemIndex + 1} / {drillData.length}] {word}
+          {accentHint}
+        </p>
+        <input className={styles.editor} value={text} placeholder='Type here' autoFocus onChange={onChange} />
+        <p>Show outline here on type error</p>
+        <footer className={styles.footer}>
+          This is a third-party app for <a href='https://lapwing.aerick.ca/'>Lapwing for Beginners</a>. Every lesson
+          data comes from the book.
+        </footer>
+      </>
+    );
+  } else {
+    return (
+      <>
+        <p>Completed!</p>
+      </>
+    );
+  }
 };
 
 export const App = (): React.JSX.Element => {
