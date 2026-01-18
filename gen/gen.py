@@ -1,9 +1,11 @@
 """Old main"""
 
+from collections import defaultdict
+from enum import Enum
+import json
+from pathlib import Path
 import random
 import sys
-from enum import Enum
-from pathlib import Path
 from typing import Optional
 
 import plover
@@ -69,8 +71,26 @@ def main():
     config, system_name = load_default()
     system.setup(system_name)
     dict = load_dict(config, system_name)
-    print(dict)
-    print(dict.reverse_lookup('word'))
+
+    root = Path("../drills")
+    word_to_outlines = defaultdict(set)
+    for path in root.glob("*.txt"):
+        logger.info(f'collecting words in {path}')
+        with path.open("r", encoding="utf-8") as f:
+            for line in f:
+                columns = line.rstrip("\n").split("\t")
+                if len(columns) >= 2:
+                    word = columns[0]
+                    word_to_outlines[word] = dict.reverse_lookup(word)
+
+    word_to_strokes = defaultdict(set)
+    for word, outlines in word_to_outlines.items():
+        strokes = set()
+        for outline in outlines:
+            for stroke in outline:
+                strokes.add(stroke)
+        word_to_strokes[word] = list(strokes)
+    print(json.dumps(word_to_strokes))
 
 
 main()
