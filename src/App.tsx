@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styles from './App.module.scss';
 import { MyCheckbox } from './MyCheckbox.tsx';
 import { MyCombobox, type MyComboboxItem } from './MyCombobox.tsx';
@@ -60,10 +60,19 @@ type DrillProps = {
 };
 
 const Drill = ({ drillData, drillDataIndex }: DrillProps): JSX.Element => {
+  // TODO: initialize on prop change
   const [text, setText] = useState('');
   const [drillItemIndex, setDrillItemIndex] = useState(0);
   const [didFail, setDidFail] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
+
+  // FIXME: This is like an anti pattern
+  useEffect(() => {
+    setText('');
+    setDrillItemIndex(0);
+    setDidFail(false);
+    setIsCompleted(false);
+  }, [drillData, drillDataIndex]);
 
   // biome-ignore lint/style/noNonNullAssertion: ignore
   const i = drillDataIndex[drillItemIndex]!;
@@ -128,6 +137,8 @@ const Drill = ({ drillData, drillDataIndex }: DrillProps): JSX.Element => {
 };
 
 export const App = (): React.JSX.Element => {
+  // TODO: restore from localStorage
+
   // shuffle
   const [shuffle, setShuffle] = useState(false);
 
