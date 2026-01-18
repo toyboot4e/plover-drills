@@ -10,14 +10,17 @@ export type MyCheckboxProps = {
 // https://base-ui.com/react/components/checkbox
 export const MyCheckbox = ({ title, defaultChecked }: MyCheckboxProps): React.JSX.Element => {
   return (
-    <label className={styles.Label}>
-      <Checkbox.Root defaultChecked={defaultChecked} className={styles.Checkbox}>
-        <Checkbox.Indicator className={styles.Indicator}>
-          <CheckIcon className={styles.Icon} />
-        </Checkbox.Indicator>
-      </Checkbox.Root>
-      {title}
-    </label>
+    <>
+      {/* biome-ignore lint/a11y/noLabelWithoutControl: ignore */}
+      <label className={styles.Label}>
+        <Checkbox.Root defaultChecked={defaultChecked} className={styles.Checkbox}>
+          <Checkbox.Indicator className={styles.Indicator}>
+            <CheckIcon className={styles.Icon} />
+          </Checkbox.Indicator>
+        </Checkbox.Root>
+        {title}
+      </label>
+    </>
   );
 };
 

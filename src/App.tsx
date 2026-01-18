@@ -43,7 +43,7 @@ const drillItems: MyComboboxItem[] = drills.map(({ name, drillData }, i) => {
   return { key: String(i), label: name, drillData };
 });
 
-const useDebouncedCallback = <T extends (...args: any[]) => void>(callback: T, delay: number) => {
+const useDebouncedCallback = <T extends (...args: unknown[]) => void>(callback: T, delay: number) => {
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   return (...args: Parameters<T>) => {
