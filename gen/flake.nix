@@ -18,7 +18,7 @@
       in
       {
         devShells.default =
-          pkgs.mkShell rec {
+          pkgs.mkShell {
             nativeBuildInputs = with pkgs; [
               zstd.dev
               glib.dev

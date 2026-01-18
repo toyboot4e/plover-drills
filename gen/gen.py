@@ -67,6 +67,7 @@ def load_dict(config: Config, system_name: str) -> StenoDictionaryCollection:
     return StenoDictionaryCollection(dicts)
 
 
+# Collect word -> translations of prefixes of outlines
 def main():
     config, system_name = load_default()
     system.setup(system_name)
@@ -87,9 +88,15 @@ def main():
     for word, outlines in word_to_outlines.items():
         strokes = set()
         for outline in outlines:
-            for stroke in outline:
-                strokes.add(stroke)
-        word_to_strokes[word] = list(strokes)
+            # for stroke in outline:
+            #     strokes.add(stroke)
+            #     word_to_strokes[word] = list(strokes)
+            translations = []
+            for i in range(1, len(outline) + 1):  
+                prefix = outline[:i]  
+                translation = dict.lookup(prefix)  
+                translations.append(translation)
+            word_to_strokes[word] = list(translations)
     print(json.dumps(word_to_strokes))
 
 

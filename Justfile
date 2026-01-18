@@ -16,6 +16,10 @@ download:
 [private]
 alias dl := download
 
+# generates `drills-gen.json`
+generate-drills-json:
+    cd gen && uv run gen.py > ../public/drills-gen.json
+
 # runs the app on dev srever at localhost:5173
 dev:
     npm run dev "$@"
