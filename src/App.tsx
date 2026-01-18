@@ -5,6 +5,7 @@ const drillFiles = import.meta.glob('../drills/*.txt', { query: '?raw', eager: t
 
 const drills = Object.entries(drillFiles)
   .map(([path, text]) => ({
+    // biome-ignore lint/style/noNonNullAssertion: ignore
     name: path.split('/').pop()!,
     text,
   }))
