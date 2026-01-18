@@ -128,12 +128,19 @@ const Drill = ({ drillData, drillDataIndex }: DrillProps): JSX.Element => {
 };
 
 export const App = (): React.JSX.Element => {
+  // shuffle
+  const [shuffle, setShuffle] = useState(false);
+
+  // selector
   const [drillProps, setDrillProps] = useState<DrillProps | null>(null);
   const onValueChange = (drillItem, _) => {
     if (drillItem === null) {
       setDrillProps(null);
     } else {
       const drillDataIndex = [...Array(drillItem.drillData.length)].map((_, i) => i);
+      if (shuffle) {
+        drillDataIndex.sort((a, b) => 0.5 - Math.random());
+      }
       setDrillProps({ drillData: drillItem.drillData, drillDataIndex });
     }
   };
@@ -143,7 +150,13 @@ export const App = (): React.JSX.Element => {
       <h1>Plove Drills for Lapwing Theory</h1>
       <main className={styles.main}>
         <p>
-          <MyCheckbox title='Shuffle' defaultChecked={false} />
+          <MyCheckbox
+            title='Shuffle'
+            checked={shuffle}
+            onCheckedChange={(shuffle, _) => {
+              setShuffle(shuffle);
+            }}
+          />
         </p>
         <MyCombobox
           items={drillItems}
