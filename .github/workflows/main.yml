@@ -24,9 +24,11 @@ jobs:
       with:
         node-version: 24
     - name: Run npm install
-      uses: npm install
+      shell: "bash"
+      run: npm install
     - name: Build Plover Drills
-      uses: npm run build
+      shell: "bash"
+      run: npm run build
     - name: Upload artifact
       uses: actions/upload-pages-artifact@v4
       with:
