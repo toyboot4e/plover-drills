@@ -67,6 +67,7 @@ def load_dict(config: Config, system_name: str) -> StenoDictionaryCollection:
 
 def main():
     config, system_name = load_default()
+    system.setup(system_name)
     dict = load_dict(config, system_name)
     print(dict)
     print(dict.reverse_lookup('word'))
