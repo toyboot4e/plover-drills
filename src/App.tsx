@@ -106,14 +106,14 @@ const Drill = ({ drillData, drillDataIndex }: DrillProps): React.JSX.Element => 
     const text = rawText.trim();
     if (text === expected) {
       setText('');
+      setDidFail(false);
       if (drillItemIndex + 1 >= drillData.length) {
         setIsCompleted(true);
       } else {
         setDrillItemIndex(drillItemIndex + 1);
-        setDidFail(false);
       }
     } else {
-      setDidFail(!matchWord(expected, text.trim()));
+      setDidFail(didFail || !matchWord(expected, text.trim()));
     }
   }, 100); // 100ms delay
 
