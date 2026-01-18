@@ -84,10 +84,6 @@ const Drill = ({ drillData }): JSX.Element => {
         </p>
         <input className={styles.editor} value={text} placeholder='Type here' autoFocus onChange={onChange} />
         {didFail && <p>{item.outline}</p>}
-        <footer className={styles.footer}>
-          This is a third-party app for <a href='https://lapwing.aerick.ca/'>Lapwing for Beginners</a>. Every lesson
-          data comes from the book.
-        </footer>
       </>
     );
   } else {
@@ -137,6 +133,12 @@ export const App = (): React.JSX.Element => {
         onValueChange={onValueChange}
       />
       {drillData && <Drill drillData={drillData} />}
+      <footer className={styles.footer}>
+        <p>
+          This is a third-party app for <a href='https://lapwing.aerick.ca/'>Lapwing for Beginners</a>. Every lesson
+          data comes from the book.
+        </p>
+      </footer>
     </>
   );
 };
