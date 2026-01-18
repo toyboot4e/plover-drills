@@ -1,13 +1,13 @@
 import { Checkbox } from '@base-ui/react/checkbox';
 import type * as React from 'react';
-import styles from './ShuffleCheckbox.module.scss';
+import styles from './MyCheckbox.module.scss';
 
-export type ShuffleCheckboxProps = {
+export type MyCheckboxProps = {
   title: string;
 };
 
 // https://base-ui.com/react/components/checkbox
-export const ShuffleCheckbox = ({ title }: ShuffleCheckboxProps): React.JSX.Element => {
+export const MyCheckbox = ({ title }: MyCheckboxProps): React.JSX.Element => {
   return (
     <label className={styles.Label}>
       <Checkbox.Root defaultChecked className={styles.Checkbox}>

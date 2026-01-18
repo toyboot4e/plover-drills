@@ -1,15 +1,15 @@
 'use client';
 import { Combobox } from '@base-ui/react/combobox';
 import * as React from 'react';
-import styles from './LessonSelector.module.scss';
+import styles from './MyCombobox.module.scss';
 
-export interface Item {
+export interface MyComboboxItem {
   key: string;
   label: string;
 }
 
-export type LessonSelectorProps = {
-  items: Array<Item>;
+export type MyComboboxProps = {
+  items: Array<MyComboboxItem>;
   placeholder: string;
   emptyString: string;
   width: string;
@@ -22,13 +22,13 @@ export type LessonSelectorProps = {
 /**
  * https://base-ui.com/react/components/combobox
  */
-export const LessonSelector = ({
+export const MyCombobox = ({
   items,
   placeholder,
   emptyString,
   width,
   onValueChange,
-}: LessonSelectorProps): React.JSX.Element => {
+}: ComboboxProps): React.JSX.Element => {
   const id = React.useId();
   return (
     <Combobox.Root items={items} onValueChange={onValueChange}>

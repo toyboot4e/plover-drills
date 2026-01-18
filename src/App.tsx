@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import styles from './App.module.scss';
-import { type Item, LessonSelector } from './LessonSelector.tsx';
-import { ShuffleCheckbox } from './ShuffleCheckbox.tsx';
+import { MyCheckbox } from './MyCheckbox.tsx';
+import { MyCombobox, type MyComboboxItem } from './MyCombobox.tsx';
 import './theme.css';
 
 type DrillData = Array<DrillItem>;
@@ -39,7 +39,7 @@ const drills: Array<{ name: string; drillData: DrillData }> = Object.entries(dri
     return a.name.localeCompare(b.name, undefined, { numeric: true });
   });
 
-const drillItems: Item[] = drills.map(({ name, drillData }, i) => {
+const drillItems: MyComboboxItem[] = drills.map(({ name, drillData }, i) => {
   return { key: String(i), label: name, drillData };
 });
 
@@ -86,8 +86,8 @@ export const App = (): React.JSX.Element => {
   return (
     <>
       <h1>Plove Drills for Lapwing Theory</h1>
-      <ShuffleCheckbox title='Shuffle' />
-      <LessonSelector
+      <MyCheckbox title='Shuffle' />
+      <MyCombobox
         items={drillItems}
         placeholder='Select a drill'
         emptyString='No drill found'
