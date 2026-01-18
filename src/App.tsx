@@ -13,7 +13,9 @@ type DrillItem = {
 };
 
 // word -> translations of prefixes of outlines
-const generatedWordMap = import('../public/drills-gen.json') as Record<string, [string]>;
+import wordMapData from '../public/drills-gen.json' assert { type: 'json' };
+
+const generatedWordMap: Record<string, Array<string>> = wordMapData;
 
 const matchWord = (expected: string, userInput: word): boolean => {
   const prefixes = generatedWordMap[expected];
@@ -96,7 +98,7 @@ const Drill = ({ drillData, drillDataIndex }: DrillProps): React.JSX.Element => 
   const i = drillDataIndex[drillItemIndex]!;
   // biome-ignore lint/style/noNonNullAssertion: ignore
   const item = drillData[i]!;
-  const expected = item.word;
+  const expected = item.word.trim();
   const accentHint = null;
 
   const handleDebounced = useDebouncedCallback((text: string) => {
