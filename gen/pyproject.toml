@@ -1,0 +1,12 @@
+[project]
+name = "plover-drills"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "loguru>=0.7.3",
+    "plover>=5.1.0",
+    "plover-lapwing-aio>=1.4.5",
+    "pyside6>=6.10.1",
+]
