@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import styles from './App.module.scss';
 import { MyCheckbox } from './MyCheckbox.tsx';
 import { MyCombobox, type MyComboboxItem } from './MyCombobox.tsx';
@@ -43,10 +43,6 @@ const drillItems: MyComboboxItem[] = drills.map(({ name, drillData }, i) => {
   return { key: String(i), label: name, drillData };
 });
 
-type DrillProps = {
-  drillData: DrillData;
-};
-
 const useDebouncedCallback = <T extends (...args: any[]) => void>(callback: T, delay: number) => {
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -58,7 +54,11 @@ const useDebouncedCallback = <T extends (...args: any[]) => void>(callback: T, d
   };
 };
 
-const Drill = ({ drillData }): JSX.Element => {
+type DrillProps = {
+  drillData: DrillData;
+};
+
+const Drill = ({ drillData }: DrillProps): JSX.Element => {
   const [text, setText] = useState('');
   const [drillItemIndex, setDrillItemIndex] = useState(0);
   const [didFail, setDidFail] = useState(false);
@@ -96,6 +96,7 @@ const Drill = ({ drillData }): JSX.Element => {
           [{drillItemIndex + 1} / {drillData.length}] {word}
           {accentHint}
         </p>
+        {/* biome-ignore lint/a11y/noAutofocus: ignore */}
         <input className={styles.editor} value={text} placeholder='Type here' autoFocus onChange={onChange} />
         {didFail && <p>{item.outline}</p>}
       </>
