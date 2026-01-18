@@ -1,6 +1,6 @@
-# Lessons
+# Drills
 
-This directory should contain lesson data files.
+This directory contains the practices drill data copied from the book:
 
 https://github.com/aerickt/lapwing-for-beginners/tree/main/src/practice
 
