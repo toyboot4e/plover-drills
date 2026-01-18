@@ -64,11 +64,14 @@ const Drill = ({ drillData }): JSX.Element => {
       setText('');
       if (drillItemIndex + 1 >= drillData.length) {
         setIsCompleted(true);
+        setDidFail(false);
       } else {
         setDrillItemIndex(drillItemIndex + 1);
+        setDidFail(false);
       }
     } else {
       setText(text);
+      setDidFail(true);
     }
   };
 
@@ -80,7 +83,7 @@ const Drill = ({ drillData }): JSX.Element => {
           {accentHint}
         </p>
         <input className={styles.editor} value={text} placeholder='Type here' autoFocus onChange={onChange} />
-        <p>Show outline here on type error</p>
+        {didFail && <p>{item.outline}</p>}
         <footer className={styles.footer}>
           This is a third-party app for <a href='https://lapwing.aerick.ca/'>Lapwing for Beginners</a>. Every lesson
           data comes from the book.
@@ -90,7 +93,23 @@ const Drill = ({ drillData }): JSX.Element => {
   } else {
     return (
       <>
-        <p>Completed!</p>
+        <p>
+          <svg
+            xmlns='http://www.w3.org/2000/svg'
+            width='16'
+            height='16'
+            viewBox='0 0 24 24'
+            fill='none'
+            stroke='green'
+            strokeWidth='3'
+            strokeLinecap='round'
+            strokeLinejoin='round'
+          >
+            <title>check</title>
+            <polyline points='20 6 9 17 4 12' />
+          </svg>
+          Completed!
+        </p>
       </>
     );
   }
