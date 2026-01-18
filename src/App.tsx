@@ -56,16 +56,19 @@ const useDebouncedCallback = <T extends (...args: unknown[]) => void>(callback: 
 
 type DrillProps = {
   drillData: DrillData;
+  drillDataIndex: Array<number>;
 };
 
-const Drill = ({ drillData }: DrillProps): JSX.Element => {
+const Drill = ({ drillData, drillDataIndex }: DrillProps): JSX.Element => {
   const [text, setText] = useState('');
   const [drillItemIndex, setDrillItemIndex] = useState(0);
   const [didFail, setDidFail] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
 
   // biome-ignore lint/style/noNonNullAssertion: ignore
-  const item = drillData[drillItemIndex]!;
+  const i = drillDataIndex[drillItemIndex]!;
+  // biome-ignore lint/style/noNonNullAssertion: ignore
+  const item = drillData[i]!;
   const word = item.word;
   const accentHint = null;
 
@@ -125,12 +128,13 @@ const Drill = ({ drillData }: DrillProps): JSX.Element => {
 };
 
 export const App = (): React.JSX.Element => {
-  const [drillData, setDrillData] = useState<DrillData | null>(null);
+  const [drillProps, setDrillProps] = useState<DrillProps | null>(null);
   const onValueChange = (drillItem, _) => {
     if (drillItem === null) {
-      setDrillData(null);
+      setDrillProps(null);
     } else {
-      setDrillData(drillItem.drillData);
+      const drillDataIndex = [...Array(drillItem.drillData.length)].map((_, i) => i);
+      setDrillProps({ drillData: drillItem.drillData, drillDataIndex });
     }
   };
 
@@ -148,7 +152,7 @@ export const App = (): React.JSX.Element => {
           width='100%'
           onValueChange={onValueChange}
         />
-        {drillData && <Drill drillData={drillData} />}
+        {drillProps && <Drill {...drillProps} />}
       </main>
       <footer className={styles.footer}>
         <p>
