@@ -88,25 +88,23 @@ const Drill = ({ drillData }): JSX.Element => {
     );
   } else {
     return (
-      <>
-        <p>
-          <svg
-            xmlns='http://www.w3.org/2000/svg'
-            width='16'
-            height='16'
-            viewBox='0 0 24 24'
-            fill='none'
-            stroke='green'
-            strokeWidth='3'
-            strokeLinecap='round'
-            strokeLinejoin='round'
-          >
-            <title>check</title>
-            <polyline points='20 6 9 17 4 12' />
-          </svg>
-          Completed!
-        </p>
-      </>
+      <p>
+        <svg
+          xmlns='http://www.w3.org/2000/svg'
+          width='16'
+          height='16'
+          viewBox='0 0 24 24'
+          fill='none'
+          stroke='green'
+          strokeWidth='3'
+          strokeLinecap='round'
+          strokeLinejoin='round'
+        >
+          <title>check</title>
+          <polyline points='20 6 9 17 4 12' />
+        </svg>
+        Completed!
+      </p>
     );
   }
 };
@@ -125,7 +123,9 @@ export const App = (): React.JSX.Element => {
     <>
       <h1>Plove Drills for Lapwing Theory</h1>
       <main className={styles.main}>
-        <MyCheckbox title='Shuffle' defaultChecked={false} />
+        <p>
+          <MyCheckbox title='Shuffle' defaultChecked={false} />
+        </p>
         <MyCombobox
           items={drillItems}
           placeholder='Select a drill'
