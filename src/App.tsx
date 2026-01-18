@@ -86,7 +86,7 @@ const Drill = ({ drillData, drillDataIndex }: DrillProps): React.JSX.Element => 
   const [didFail, setDidFail] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
 
-  // FIXME: This is like an anti pattern
+  // FIXME: This is likely an anti pattern
   // biome-ignore lint/correctness/useExhaustiveDependencies: initilize on prop change
   useEffect(() => {
     setText('');
@@ -138,6 +138,7 @@ const Drill = ({ drillData, drillDataIndex }: DrillProps): React.JSX.Element => 
   } else {
     return (
       <p>
+        [{drillData.length} / {drillData.length}]{' '}
         <svg
           xmlns='http://www.w3.org/2000/svg'
           width='16'
