@@ -1,5 +1,5 @@
 import type { Combobox } from '@base-ui/react/combobox';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useReducer, useRef, useState } from 'react';
 import styles from './App.module.scss';
 import { MyCheckbox } from './MyCheckbox.tsx';
 import { MyCombobox, type MyComboboxItem } from './MyCombobox.tsx';
@@ -62,16 +62,75 @@ const drillItems: Array<MyComboboxItem & { drillData: DrillData }> = drills.map(
   return { key: String(i), label: name, drillData };
 });
 
-// biome-ignore lint/suspicious/noExplicitAny: ignore
-const useDebouncedCallback = <T extends (...args: any[]) => void>(callback: T, delay: number) => {
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+type DrillState = {
+  text: string;
+  drillItemIndex: number;
+  fail: boolean;
+  isCompleted: boolean;
+};
 
-  return (...args: Parameters<T>) => {
-    if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    timeoutRef.current = setTimeout(() => {
-      callback(...args);
-    }, delay);
-  };
+type Action =
+  | { type: 'RESET' }
+  | { type: 'SET_TEXT'; text: string }
+  | { type: 'FAIL' }
+  | { type: 'NEXT'; length: number }
+  | { type: 'PREV'; length: number };
+
+const initialDrillState: DrillState = {
+  text: '',
+  drillItemIndex: 0,
+  fail: false,
+  isCompleted: false,
+};
+
+const reduceDrillState = (state: DrillState, action: Action): DrillState => {
+  switch (action.type) {
+    case 'RESET':
+      return initialDrillState;
+
+    case 'SET_TEXT':
+      return { ...state, text: action.text };
+
+    case 'FAIL':
+      return { ...state, fail: true };
+
+    case 'NEXT': {
+      return {
+        text: '',
+        fail: false,
+        drillItemIndex: Math.min(action.length - 1, state.drillItemIndex + 1),
+        isCompleted: state.drillItemIndex + 1 >= action.length,
+      };
+    }
+
+    case 'PREV': {
+      return state.isCompleted
+        ? {
+            text: '',
+            fail: false,
+            drillItemIndex: state.drilItemIndex,
+            isCompleted: false,
+          }
+        : {
+            text: '',
+            fail: false,
+            drillItemIndex: Math.max(0, state.drillItemIndex - 1),
+            isCompleted: false,
+          };
+    }
+
+    default: {
+      console.log(`error: ${action}`);
+      return state;
+    }
+  }
+};
+
+const useDrillState = (
+  drillData: DrillData,
+  drillDataIndex: Array<number>,
+): [DrillState, React.Dispatch<DrillState>] => {
+  return useReducer(reduceDrillState, initialDrillState);
 };
 
 type DrillProps = {
@@ -80,82 +139,57 @@ type DrillProps = {
 };
 
 const Drill = ({ drillData, drillDataIndex }: DrillProps): React.JSX.Element => {
-  // TODO: initialize on prop change
-  const [text, setText] = useState('');
-  const [drillItemIndex, setDrillItemIndex] = useState(0);
-  const [didFail, setDidFail] = useState(false);
-  const [isCompleted, setIsCompleted] = useState(false);
+  const [state, dispatchState] = useDrillState(drillData, drillDataIndex);
 
-  // TODO: useReduer
-  // FIXME: This is likely an anti pattern
-  // biome-ignore lint/correctness/useExhaustiveDependencies: initilize on prop change
+  // FIXME: the dependency array is an anti pattern. Fix it.
+  // initialize on prop change
   useEffect(() => {
-    setText('');
-    setDrillItemIndex(0);
-    setDidFail(false);
-    setIsCompleted(false);
-  }, [drillData, drillDataIndex]);
-
-  // TODO: useReducer
-  const gotoNextDrillItem = () => {
-    setText('');
-    setDidFail(false);
-    if (drillItemIndex + 1 >= drillData.length) {
-      setIsCompleted(true);
-    } else {
-      setIsCompleted(false);
-      setDrillItemIndex(drillItemIndex + 1);
-    }
-  };
-
-  // TODO: useReducer
-  const gotoPrevDrillItem = () => {
-    setText('');
-    setDidFail(false);
-    if (isCompleted) {
-      setIsCompleted(false);
-    } else if (drillItemIndex == 0) {
-      setIsCompleted(false);
-    } else if (drillItemIndex + 1 === drillData.length) {
-      setIsCompleted(true);
-    } else {
-      setIsCompleted(false);
-      setDrillItemIndex(drillItemIndex + 1);
-    }
-  };
+    dispatchState({ type: 'RESET' });
+  }, [drillData, drillDataIndex, dispatchState]);
 
   // biome-ignore lint/style/noNonNullAssertion: ignore
-  const i = drillDataIndex[drillItemIndex]!;
+  const i = drillDataIndex[state.drillItemIndex]!;
   // biome-ignore lint/style/noNonNullAssertion: ignore
   const item = drillData[i]!;
   const expected = item.word.trim();
   const accentHint = null;
 
-  const onChangeDebounced = useDebouncedCallback((rawText: string) => {
-    const text = rawText.trim();
+  // biome-ignore lint/suspicious/noExplicitAny: ignore
+  const useDebouncedCallback = <T extends (...args: any[]) => void>(callback: T, delay: number) => {
+    const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    return (...args: Parameters<T>) => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      timeoutRef.current = setTimeout(() => {
+        callback(...args);
+      }, delay);
+    };
+  };
+
+  const onChangeDebounced = useDebouncedCallback((text: string) => {
     if (text === expected) {
-      gotoNextDrillItem();
-    } else {
-      setDidFail(didFail || !matchWord(expected, text.trim()));
+      dispatchState({ type: 'NEXT', length: drillData.length });
+    } else if (!matchWord(expected, text.trim())) {
+      dispatchState({ type: 'FAIL' });
     }
   }, 100); // 100ms delay
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const text = e.target.value.trim();
-    setText(text);
+    const text = e.target.value; // TODO: trim?
+    dispatchState({ type: 'SET_TEXT', text });
     onChangeDebounced(text);
   };
 
-  if (!isCompleted) {
+  if (!state.isCompleted) {
     return (
       <>
         <p>
-          [{drillItemIndex + 1} / {drillData.length}] {expected}
+          [{state.drillItemIndex + 1} / {drillData.length}] {expected}
           {accentHint}
         </p>
         {/* biome-ignore lint/a11y/noAutofocus: ignore */}
-        <input className={styles.editor} value={text} placeholder='Type here' autoFocus onChange={onChange} />
-        {didFail && <OutlineHint outline={item.outline} />}
+        <input className={styles.editor} value={state.text} placeholder='Type here' autoFocus onChange={onChange} />
+        {state.fail && <OutlineHint outline={item.outline} />}
       </>
     );
   } else {
