@@ -12,6 +12,21 @@ type DrillItem = {
   outline: Array<string>;
 };
 
+// word -> translations of prefixes of outlines
+const generatedWordMap = import('../public/drills-gen.json') as Record<string, [string]>;
+
+const matchWord = (expected: string, userInput: word): boolean => {
+  const prefixes = generatedWordMap[expected];
+  if (typeof prefixes !== 'undefined') {
+    // TODO: Is this deep comparison?
+    return prefixes.some((p) => p === userInput);
+  } else {
+    // needs regeneration of `drills-gen.json`
+    console.log(`error: non-registerd word '${expected}' was looked up`);
+    return false;
+  }
+};
+
 const drillFiles = import.meta.glob('../drills/*.txt', {
   query: '?raw',
   eager: true,
@@ -81,11 +96,11 @@ const Drill = ({ drillData, drillDataIndex }: DrillProps): React.JSX.Element => 
   const i = drillDataIndex[drillItemIndex]!;
   // biome-ignore lint/style/noNonNullAssertion: ignore
   const item = drillData[i]!;
-  const word = item.word;
+  const expected = item.word;
   const accentHint = null;
 
   const handleDebounced = useDebouncedCallback((text: string) => {
-    if (text.trim() === word) {
+    if (matchWord(expected, text.trim())) {
       setText('');
       if (drillItemIndex + 1 >= drillData.length) {
         setIsCompleted(true);
@@ -108,7 +123,7 @@ const Drill = ({ drillData, drillDataIndex }: DrillProps): React.JSX.Element => 
     return (
       <>
         <p>
-          [{drillItemIndex + 1} / {drillData.length}] {word}
+          [{drillItemIndex + 1} / {drillData.length}] {expected}
           {accentHint}
         </p>
         {/* biome-ignore lint/a11y/noAutofocus: ignore */}
