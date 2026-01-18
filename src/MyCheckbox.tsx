@@ -4,13 +4,14 @@ import styles from './MyCheckbox.module.scss';
 
 export type MyCheckboxProps = {
   title: string;
+  defaultChecked: booelan;
 };
 
 // https://base-ui.com/react/components/checkbox
-export const MyCheckbox = ({ title }: MyCheckboxProps): React.JSX.Element => {
+export const MyCheckbox = ({ title, defaultChecked }: MyCheckboxProps): React.JSX.Element => {
   return (
     <label className={styles.Label}>
-      <Checkbox.Root defaultChecked className={styles.Checkbox}>
+      <Checkbox.Root defaultChecked={defaultChecked} className={styles.Checkbox}>
         <Checkbox.Indicator className={styles.Indicator}>
           <CheckIcon className={styles.Icon} />
         </Checkbox.Indicator>

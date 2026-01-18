@@ -86,7 +86,7 @@ export const App = (): React.JSX.Element => {
   return (
     <>
       <h1>Plove Drills for Lapwing Theory</h1>
-      <MyCheckbox title='Shuffle' />
+      <MyCheckbox title='Shuffle' defaultChecked={false} />
       <MyCombobox
         items={drillItems}
         placeholder='Select a drill'
