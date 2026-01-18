@@ -7,6 +7,44 @@ const chars: Array<Array<char>> = [
   ['', '', '#', 'A', 'O', '', 'E', 'U', '#', '', '', ''],
 ];
 
+// # T P H * _ * F P L T D
+// S K W R _ _ _ R B G S Z
+// _ _ # A O _ E U # _ _ _
+
+// steno order: #STKPWHRAO*EUFRPBLGTSDZ
+const stenoOrder = [
+  // #0    1       2       3       4       5       6       7
+  [0, 0],
+  [1, 0],
+  [0, 1],
+  [1, 1],
+  [0, 2],
+  [1, 2],
+  [0, 3],
+  [1, 3],
+  // *8
+  [0, 4],
+  // #9    A10     O11     E12     U13      #14
+  [2, 2],
+  [2, 3],
+  [2, 4],
+  [2, 6],
+  [2, 7],
+  [2, 8],
+  // *15
+  [0, 6],
+  [0, 7],
+  [1, 7],
+  [0, 8],
+  [1, 8],
+  [0, 9],
+  [1, 9],
+  [0, 10],
+  [1, 10],
+  [0, 11],
+  [1, 11],
+];
+
 const collectKeyPress = (chars: Array<Array<char>>, stroke: string): Array<Array<boolean>> => {
   const ret = [
     Array(chars[0].length).fill(false),
@@ -17,39 +55,6 @@ const collectKeyPress = (chars: Array<Array<char>>, stroke: string): Array<Array
   if (stroke === undefined || stroke === null || stroke === '') {
     return ret;
   }
-
-  // steno order: #STKPWHRAO*EUFRPBLGTSDZ
-  const stenoOrder = [
-    // #0    1       2       3       4       5       6       7
-    [0, 0],
-    [1, 0],
-    [0, 1],
-    [1, 1],
-    [0, 2],
-    [1, 2],
-    [0, 3],
-    [1, 3],
-    // *8
-    [0, 4],
-    // #9    A10     O11     E12     U13      #14
-    [2, 2],
-    [2, 3],
-    [2, 4],
-    [2, 6],
-    [2, 7],
-    [2, 8],
-    // *15
-    [0, 7],
-    [1, 7],
-    [0, 8],
-    [1, 8],
-    [0, 9],
-    [1, 9],
-    [0, 10],
-    [1, 10],
-    [0, 11],
-    [1, 11],
-  ];
 
   const iRhs = 12;
 
@@ -70,9 +75,11 @@ const collectKeyPress = (chars: Array<Array<char>>, stroke: string): Array<Array
   }
 
   // '*'
-  ret[0][6] = ret[0][4];
+  ret[0][6] |= ret[0][4];
+  ret[0][4] |= ret[0][6];
 
   // '#'
+  ret[0][0] |= ret[2][2] || ret[2][8];
   ret[2][2] = ret[0][0];
   ret[2][8] = ret[0][0];
 
