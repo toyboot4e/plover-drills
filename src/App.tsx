@@ -9,13 +9,13 @@ type DrillData = Array<DrillItem>;
 
 type DrillItem = {
   word: string;
-  outline: string;
+  outline: Array<string>;
 };
 
-const drillFiles: Record<string, { default: string }> = import.meta.glob<string>('../drills/*.txt', {
+const drillFiles = import.meta.glob('../drills/*.txt', {
   query: '?raw',
   eager: true,
-});
+}) as Record<string, { default: string }>;
 
 const drills: Array<{ name: string; drillData: DrillData }> = Object.entries(drillFiles)
   .map(([path, text]) => {
@@ -40,11 +40,12 @@ const drills: Array<{ name: string; drillData: DrillData }> = Object.entries(dri
     return a.name.localeCompare(b.name, undefined, { numeric: true });
   });
 
-const drillItems: MyComboboxItem[] = drills.map(({ name, drillData }, i) => {
+const drillItems: Array<MyComboboxItem & { drillData: DrillData }> = drills.map(({ name, drillData }, i) => {
   return { key: String(i), label: name, drillData };
 });
 
-const useDebouncedCallback = <T extends (...args: unknown[]) => void>(callback: T, delay: number) => {
+// biome-ignore lint/suspicious/noExplicitAny: ignore
+const useDebouncedCallback = <T extends (...args: any[]) => void>(callback: T, delay: number) => {
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   return (...args: Parameters<T>) => {
@@ -60,7 +61,7 @@ type DrillProps = {
   drillDataIndex: Array<number>;
 };
 
-const Drill = ({ drillData, drillDataIndex }: DrillProps): JSX.Element => {
+const Drill = ({ drillData, drillDataIndex }: DrillProps): React.JSX.Element => {
   // TODO: initialize on prop change
   const [text, setText] = useState('');
   const [drillItemIndex, setDrillItemIndex] = useState(0);
@@ -146,7 +147,7 @@ export const App = (): React.JSX.Element => {
 
   // selector
   const [drillProps, setDrillProps] = useState<DrillProps | null>(null);
-  const onValueChange = (drillItem, _) => {
+  const onValueChange = (drillItem: DrillItem & { drillData: DrillData }, _) => {
     if (drillItem === null) {
       setDrillProps(null);
     } else {
