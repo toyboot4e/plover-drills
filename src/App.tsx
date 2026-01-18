@@ -86,6 +86,7 @@ const Drill = ({ drillData, drillDataIndex }: DrillProps): React.JSX.Element => 
   const [didFail, setDidFail] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
 
+  // TODO: useReduer
   // FIXME: This is likely an anti pattern
   // biome-ignore lint/correctness/useExhaustiveDependencies: initilize on prop change
   useEffect(() => {
@@ -95,6 +96,34 @@ const Drill = ({ drillData, drillDataIndex }: DrillProps): React.JSX.Element => 
     setIsCompleted(false);
   }, [drillData, drillDataIndex]);
 
+  // TODO: useReducer
+  const gotoNextDrillItem = () => {
+    setText('');
+    setDidFail(false);
+    if (drillItemIndex + 1 >= drillData.length) {
+      setIsCompleted(true);
+    } else {
+      setIsCompleted(false);
+      setDrillItemIndex(drillItemIndex + 1);
+    }
+  };
+
+  // TODO: useReducer
+  const gotoPrevDrillItem = () => {
+    setText('');
+    setDidFail(false);
+    if (isCompleted) {
+      setIsCompleted(false);
+    } else if (drillItemIndex == 0) {
+      setIsCompleted(false);
+    } else if (drillItemIndex + 1 === drillData.length) {
+      setIsCompleted(true);
+    } else {
+      setIsCompleted(false);
+      setDrillItemIndex(drillItemIndex + 1);
+    }
+  };
+
   // biome-ignore lint/style/noNonNullAssertion: ignore
   const i = drillDataIndex[drillItemIndex]!;
   // biome-ignore lint/style/noNonNullAssertion: ignore
@@ -102,16 +131,10 @@ const Drill = ({ drillData, drillDataIndex }: DrillProps): React.JSX.Element => 
   const expected = item.word.trim();
   const accentHint = null;
 
-  const handleDebounced = useDebouncedCallback((rawText: string) => {
+  const onChangeDebounced = useDebouncedCallback((rawText: string) => {
     const text = rawText.trim();
     if (text === expected) {
-      setText('');
-      setDidFail(false);
-      if (drillItemIndex + 1 >= drillData.length) {
-        setIsCompleted(true);
-      } else {
-        setDrillItemIndex(drillItemIndex + 1);
-      }
+      gotoNextDrillItem();
     } else {
       setDidFail(didFail || !matchWord(expected, text.trim()));
     }
@@ -120,7 +143,7 @@ const Drill = ({ drillData, drillDataIndex }: DrillProps): React.JSX.Element => 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const text = e.target.value.trim();
     setText(text);
-    handleDebounced(text);
+    onChangeDebounced(text);
   };
 
   if (!isCompleted) {
