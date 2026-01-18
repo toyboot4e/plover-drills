@@ -2,30 +2,52 @@ import { useState } from 'react';
 import styles from './App.module.scss';
 import { type Item, LessonSelector } from './LessonSelector.tsx';
 
-const drillFiles = import.meta.glob('../drills/*.txt', { query: '?raw', eager: true });
+type DrillData = Array<DrillItem>;
 
-const drills = Object.entries(drillFiles)
-  .map(([path, text]) => ({
-    // biome-ignore lint/style/noNonNullAssertion: ignore
-    name: path.split('/').pop()!,
-    text,
-  }))
+type DrillItem = {
+  word: string;
+  outline: string;
+};
+
+const drillFiles: Record<string, { default: string }> = import.meta.glob<string>('../drills/*.txt', {
+  query: '?raw',
+  eager: true,
+});
+
+const drills: Array<{ name: string; drillData: DrillData }> = Object.entries(drillFiles)
+  .map(([path, text]) => {
+    const drillData: DrillData = text.default
+      .trim()
+      .split('\n')
+      .map((line) => {
+        const columns = line.split('\t');
+        return {
+          word: columns[0],
+          outline: columns[1].split('/'),
+        };
+      });
+
+    return {
+      // biome-ignore lint/style/noNonNullAssertion: ignore
+      name: path.split('/').pop()!,
+      drillData,
+    };
+  })
   .sort((a, b) => {
     return a.name.localeCompare(b.name, undefined, { numeric: true });
   });
 
-const drillItems: Item[] = drills.map(({ name }, i) => {
-  return { index: i, key: String(i), label: name };
+const drillItems: Item[] = drills.map(({ name, drillData }, i) => {
+  return { key: String(i), label: name, drillData };
 });
 
 const App = (): React.JSX.Element => {
-  const drillData: Array<[string, string]> | null = null;
+  const [drillData, setDrillData] = useState<DrillData | null>(null);
   const [drillIndex, setDrillIndex] = useState(0);
   const [didFail, setDidFail] = useState(false);
 
-  const onValueChange = ({ index }, _) => {
-    console.log('->', index);
-    // drillData =
+  const onValueChange = ({ drillData }, _) => {
+    setDrillData(drillData);
   };
 
   return (
@@ -33,17 +55,15 @@ const App = (): React.JSX.Element => {
       <h1>Plove Drills for Lapwing Theory</h1>
       <LessonSelector
         items={drillItems}
-        placeholder='Select drill'
+        placeholder='Select a drill'
         emptyString='No drill found'
         width='100%'
         onValueChange={onValueChange}
       />
-      {drillData === null ? (
-        <p>Select lesson with the combobox</p>
-      ) : (
+      {drillData !== null && (
         <>
-          <p>[1/n] Type this: example [accent hint here]</p>
-          <div className={styles.editor} contentEditable />
+          <p>[1/n] word [accent hint here]</p>
+          <input className={styles.editor} placeholder='Type here' autoFocus />
           <p>Show outline here on type error</p>
           <footer className={styles.footer}>
             This is a third-party app for <a href='https://lapwing.aerick.ca/'>Lapwing for Beginners</a>. Every lesson
