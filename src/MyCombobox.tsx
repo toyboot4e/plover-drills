@@ -8,27 +8,24 @@ export interface MyComboboxItem {
   label: string;
 }
 
-export type MyComboboxProps = {
-  items: Array<MyComboboxItem>;
+export type MyComboboxProps<T extends MyComboboxItem> = {
+  items: Array<T>;
   placeholder: string;
   emptyString: string;
   width: string;
-  onValueChange?: (
-    value: MyComboboxItem[] | MyComboboxItem | any | null,
-    eventDetails: Combobox.Root.ChangeEventDetails,
-  ) => void;
+  onValueChange?: (value: T | null, eventDetails: Combobox.Root.ChangeEventDetails) => void;
 };
 
 /**
  * https://base-ui.com/react/components/combobox
  */
-export const MyCombobox = ({
+export const MyCombobox = <T extends MyComboboxItem>({
   items,
   placeholder,
   emptyString,
   width,
   onValueChange,
-}: MyComboboxProps): React.JSX.Element => {
+}: MyComboboxProps<T>): React.JSX.Element => {
   const id = React.useId();
   return (
     <Combobox.Root items={items} onValueChange={onValueChange}>

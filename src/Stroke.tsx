@@ -97,7 +97,7 @@ export const Stroke = ({ stroke }: StrokeProps): React.JSX.Element => {
       return (
         <div
           className={`${c === '' ? style.stenoVizEmpty : style.stenoVizRect} ${c === '*' && style.stenoVizFat} ${isPressed[row][col] && style.stenoVizRectPressed}`}
-          style={{ gridRow: row + 1, gridCol: col + 1 }}
+          style={{ gridRow: row + 1, gridColumn: col + 1 }}
           // biome-ignore lint/suspicious/noArrayIndexKey: immutable array
           key={`${row}-${col}`}
         >

@@ -1,4 +1,4 @@
-import { Combobox } from '@base-ui/react/combobox';
+import type { Combobox } from '@base-ui/react/combobox';
 import { useEffect, useRef, useState } from 'react';
 import styles from './App.module.scss';
 import { MyCheckbox } from './MyCheckbox.tsx';
@@ -14,9 +14,9 @@ type DrillItem = {
 };
 
 // word -> translations of prefixes of outlines
-import wordMapData from '../public/drills-gen.json' assert { type: 'json' };
+import wordMapData from '../public/drills-gen.json' with { type: 'json' };
 
-const generatedWordMap: Record<string, Array<string>> = wordMapData;
+const generatedWordMap = wordMapData as Record<string, Array<string>>;
 
 const matchWord = (expected: string, userInput: string): boolean => {
   const prefixes = generatedWordMap[expected];
@@ -156,7 +156,7 @@ const Drill = ({ drillData, drillDataIndex }: DrillProps): React.JSX.Element => 
       </p>
     );
   }
-}
+};
 
 export const App = (): React.JSX.Element => {
   // TODO: restore from localStorage
@@ -166,7 +166,10 @@ export const App = (): React.JSX.Element => {
 
   // selector
   const [drillProps, setDrillProps] = useState<DrillProps | null>(null);
-  const onValueChange = (drillItem: DrillItem & { drillData: DrillData } , _: Combobox.Root.ChangeEventDetails) => {
+  const onValueChange = (
+    drillItem: (MyComboboxItem & { drillData: DrillData }) | null,
+    _: Combobox.Root.ChangeEventDetails,
+  ) => {
     if (drillItem === null) {
       setDrillProps(null);
     } else {
@@ -175,8 +178,8 @@ export const App = (): React.JSX.Element => {
         drillDataIndex.sort((_a, _b) => 0.5 - Math.random());
       }
       setDrillProps({ drillData: drillItem.drillData, drillDataIndex });
-    };
-  };  
+    }
+  };
 
   return (
     <>
@@ -208,4 +211,4 @@ export const App = (): React.JSX.Element => {
       </footer>
     </>
   );
-}
+};
