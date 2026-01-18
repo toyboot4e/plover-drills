@@ -48,6 +48,7 @@ type DrillProps = {
 };
 
 const Drill = ({ drillData }): JSX.Element => {
+  const [text, setText] = useState('');
   const [drillItemIndex, setDrillItemIndex] = useState(0);
   const [didFail, setDidFail] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
@@ -57,13 +58,24 @@ const Drill = ({ drillData }): JSX.Element => {
   const word = item.word;
   const accentHint = null;
 
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const text = e.target.value;
+    if (text.trim() === word) {
+      console.log('match');
+      setText(''); // clear input
+      setDrillItemIndex(drillItemIndex + 1);
+    } else {
+      setText(text);
+    }
+  };
+
   return (
     <>
       <p>
-        [1/n] {word}
+        [{drillItemIndex + 1} / {drillData.length}] {word}
         {accentHint}
       </p>
-      <input className={styles.editor} placeholder='Type here' autoFocus />
+      <input className={styles.editor} value={text} placeholder='Type here' autoFocus onChange={onChange} />
       <p>Show outline here on type error</p>
       <footer className={styles.footer}>
         This is a third-party app for <a href='https://lapwing.aerick.ca/'>Lapwing for Beginners</a>. Every lesson data
