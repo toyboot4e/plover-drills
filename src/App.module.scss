@@ -1,0 +1,26 @@
+/* TODO: static typing */
+
+.editor {
+  resize: none;
+  height: 1.5em;
+  border: 1px solid rgb(175, 175, 175);
+  border-radius: 2px;
+  background-color: rgb(43, 42, 51);
+}
+
+// .editor::before {
+//   content: attr(data-placeholder);
+//   color: #888;
+// }
+
+.lessonSelector {
+  width: 800px;
+}
+
+.lessonSelector::backdrop {
+  background: rgb(0 0 0 / 50%);
+}
+
+.footer {
+  color: #888;
+}
