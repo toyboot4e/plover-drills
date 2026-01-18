@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import styles from './App.module.scss';
 import { MyCheckbox } from './MyCheckbox.tsx';
 import { MyCombobox, type MyComboboxItem } from './MyCombobox.tsx';
+import { OutlineHint } from './Stroke.tsx';
 import './theme.css';
 
 type DrillData = Array<DrillItem>;
@@ -67,6 +68,7 @@ const Drill = ({ drillData, drillDataIndex }: DrillProps): JSX.Element => {
   const [isCompleted, setIsCompleted] = useState(false);
 
   // FIXME: This is like an anti pattern
+  // biome-ignore lint/correctness/useExhaustiveDependencies: initilize on prop change
   useEffect(() => {
     setText('');
     setDrillItemIndex(0);
@@ -110,7 +112,7 @@ const Drill = ({ drillData, drillDataIndex }: DrillProps): JSX.Element => {
         </p>
         {/* biome-ignore lint/a11y/noAutofocus: ignore */}
         <input className={styles.editor} value={text} placeholder='Type here' autoFocus onChange={onChange} />
-        {didFail && <p>{item.outline}</p>}
+        {didFail && <OutlineHint outline={item.outline} />}
       </>
     );
   } else {
@@ -150,7 +152,7 @@ export const App = (): React.JSX.Element => {
     } else {
       const drillDataIndex = [...Array(drillItem.drillData.length)].map((_, i) => i);
       if (shuffle) {
-        drillDataIndex.sort((a, b) => 0.5 - Math.random());
+        drillDataIndex.sort((_a, _b) => 0.5 - Math.random());
       }
       setDrillProps({ drillData: drillItem.drillData, drillDataIndex });
     }
