@@ -101,8 +101,9 @@ const Drill = ({ drillData, drillDataIndex }: DrillProps): React.JSX.Element => 
   const expected = item.word.trim();
   const accentHint = null;
 
-  const handleDebounced = useDebouncedCallback((text: string) => {
-    if (matchWord(expected, text.trim())) {
+  const handleDebounced = useDebouncedCallback((rawText: string) => {
+    const text = rawText.trim()
+    if (text === expected) {
       setText('');
       if (drillItemIndex + 1 >= drillData.length) {
         setIsCompleted(true);
@@ -111,7 +112,7 @@ const Drill = ({ drillData, drillDataIndex }: DrillProps): React.JSX.Element => 
         setDidFail(false);
       }
     } else {
-      setDidFail(true);
+      setDidFail(!matchWord(expected, text.trim()));
     }
   }, 100); // 100ms delay
 
