@@ -124,15 +124,17 @@ export const App = (): React.JSX.Element => {
   return (
     <>
       <h1>Plove Drills for Lapwing Theory</h1>
-      <MyCheckbox title='Shuffle' defaultChecked={false} />
-      <MyCombobox
-        items={drillItems}
-        placeholder='Select a drill'
-        emptyString='No drill found'
-        width='100%'
-        onValueChange={onValueChange}
-      />
-      {drillData && <Drill drillData={drillData} />}
+      <main className={styles.main}>
+        <MyCheckbox title='Shuffle' defaultChecked={false} />
+        <MyCombobox
+          items={drillItems}
+          placeholder='Select a drill'
+          emptyString='No drill found'
+          width='100%'
+          onValueChange={onValueChange}
+        />
+        {drillData && <Drill drillData={drillData} />}
+      </main>
       <footer className={styles.footer}>
         <p>
           This is a third-party app for <a href='https://lapwing.aerick.ca/'>Lapwing for Beginners</a>. Every lesson
