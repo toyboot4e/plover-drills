@@ -108,7 +108,7 @@ const reduceDrillState = (state: DrillState, action: Action): DrillState => {
         ? {
             text: '',
             fail: false,
-            drillItemIndex: state.drilItemIndex,
+            drillItemIndex: state.drillItemIndex,
             isCompleted: false,
           }
         : {
