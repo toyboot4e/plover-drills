@@ -1,5 +1,5 @@
 import type { Combobox } from '@base-ui/react/combobox';
-import { useEffect, useReducer, useRef, useState } from 'react';
+import { useReducer, useRef, useState } from 'react';
 import styles from './App.module.scss';
 import { MyCheckbox } from './MyCheckbox.tsx';
 import { MyCombobox, type MyComboboxItem } from './MyCombobox.tsx';
@@ -58,8 +58,8 @@ const drills: Array<{ name: string; drillData: DrillData }> = Object.entries(dri
     return a.name.localeCompare(b.name, undefined, { numeric: true });
   });
 
-const drillItems: Array<MyComboboxItem & { drillData: DrillData }> = drills.map(({ name, drillData }, i) => {
-  return { key: String(i), label: name, drillData };
+const drillItems: Array<MyComboboxItem & { drillData: DrillData }> = drills.map(({ name, drillData }) => {
+  return { key: name, label: name, drillData };
 });
 
 type DrillState = {
@@ -133,12 +133,6 @@ type DrillProps = {
 
 const Drill = ({ drillData, drillDataIndex }: DrillProps): React.JSX.Element => {
   const [state, dispatchState] = useReducer(reduceDrillState, initialDrillState);
-
-  // FIXME: the dependency array is an anti pattern. Fix it.
-  // initialize on prop change
-  useEffect(() => {
-    dispatchState({ type: 'RESET' });
-  }, [drillData, drillDataIndex, dispatchState]);
 
   // biome-ignore lint/style/noNonNullAssertion: ignore
   const i = drillDataIndex[state.drillItemIndex]!;
@@ -253,7 +247,7 @@ export const App = (): React.JSX.Element => {
   const [shuffle, setShuffle] = useState(false);
 
   // selector
-  const [drillProps, setDrillProps] = useState<DrillProps | null>(null);
+  const [drillProps, setDrillProps] = useState<(DrillProps & { filename: string }) | null>(null);
   const onValueChange = (
     drillItem: (MyComboboxItem & { drillData: DrillData }) | null,
     _: Combobox.Root.ChangeEventDetails,
@@ -265,7 +259,7 @@ export const App = (): React.JSX.Element => {
       if (shuffle) {
         drillDataIndex.sort((_a, _b) => 0.5 - Math.random());
       }
-      setDrillProps({ drillData: drillItem.drillData, drillDataIndex });
+      setDrillProps({ filename: drillItem.key, drillData: drillItem.drillData, drillDataIndex });
     }
   };
 
@@ -289,7 +283,14 @@ export const App = (): React.JSX.Element => {
           width='100%'
           onValueChange={onValueChange}
         />
-        {drillProps && <Drill {...drillProps} />}
+        {drillProps && (
+          <Drill
+            drillData={drillProps.drillData}
+            drillDataIndex={drillProps.drillDataIndex}
+            /* key change = new component (reset state) */
+            key={drillProps.filename}
+          />
+        )}
       </main>
       <footer className={styles.footer}>
         <p>
