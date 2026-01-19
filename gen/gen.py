@@ -87,16 +87,16 @@ def main():
     word_to_strokes = defaultdict(set)
     for word, outlines in word_to_outlines.items():
         strokes = set()
+        translations = set()
         for outline in outlines:
             # for stroke in outline:
             #     strokes.add(stroke)
             #     word_to_strokes[word] = list(strokes)
-            translations = []
             for i in range(1, len(outline) + 1):  
                 prefix = outline[:i]  
                 translation = dict.lookup(prefix)  
-                translations.append(translation)
-            word_to_strokes[word] = list(translations)
+                translations.add(translation)
+        word_to_strokes[word] = list(translations)
     print(json.dumps(word_to_strokes))
 
 
