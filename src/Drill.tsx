@@ -185,7 +185,7 @@ export const Drill = ({ drillData, drillDataIndex }: DrillProps): React.JSX.Elem
   const expected = item.word.trim();
 
   const onChangeDebounced = useDebouncedCallback((text: string) => {
-    if (text === expected) {
+    if (text.trim() === expected) {
       dispatchState({ type: 'NEXT', length: drillData.length });
     } else if (!matchWord(expected, text.trim())) {
       dispatchState({ type: 'FAIL' });
