@@ -39,9 +39,10 @@ export const App = (): React.JSX.Element => {
   );
   const [defaultDrill] = useState(() => drill);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: do not shuffle on toggle
   const drillProps = useMemo<(DrillProps & { filename: string }) | null>(
     () => (drill ? createDrillProps(shuffle, drill) : null),
-    [drill, shuffle],
+    [drill],
   );
 
   const onValueChange = (
