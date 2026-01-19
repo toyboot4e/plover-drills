@@ -173,48 +173,48 @@ const Drill = ({ drillData, drillDataIndex }: DrillProps): React.JSX.Element => 
     onChangeDebounced(text);
   };
 
+  const nextPrev = (
+    <span className={styles.right}>
+      <button
+        type='button'
+        aria-label='Previous'
+        onClick={() => dispatchState({ type: 'PREV', length: drillData.length })}
+      >
+        <svg width='24' height='24' viewBox='0 0 24 24' style={{ verticalAlign: 'middle' }} aria-hidden='true'>
+          <title>previous</title>
+          <path
+            d='M15 18l-6-6 6-6'
+            fill='none'
+            stroke='currentColor'
+            strokeWidth='2'
+            strokeLinecap='round'
+            strokeLinejoin='round'
+          />
+        </svg>
+      </button>
+      <button type='button' aria-label='Next' onClick={() => dispatchState({ type: 'NEXT', length: drillData.length })}>
+        <svg width='24' height='24' viewBox='0 0 24 24' style={{ verticalAlign: 'middle' }} aria-hidden='true'>
+          <title>next</title>
+          <path
+            d='M9 6l6 6-6 6'
+            fill='none'
+            stroke='currentColor'
+            strokeWidth='2'
+            strokeLinecap='round'
+            strokeLinejoin='round'
+          />
+        </svg>
+      </button>
+    </span>
+  );
+
   if (!state.isCompleted) {
     return (
       <>
         <p className={styles.lessonStatus}>
           [{state.drillItemIndex + 1} / {drillData.length}] {expected}
           {accentHint}
-          <span className={styles.right}>
-            <button
-              type='button'
-              aria-label='Previous'
-              onClick={() => dispatchState({ type: 'PREV', length: drillData.length })}
-            >
-              <svg width='24' height='24' viewBox='0 0 24 24' style={{ verticalAlign: 'middle' }} aria-hidden='true'>
-                <title>previous</title>
-                <path
-                  d='M15 18l-6-6 6-6'
-                  fill='none'
-                  stroke='currentColor'
-                  strokeWidth='2'
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                />
-              </svg>
-            </button>
-            <button
-              type='button'
-              aria-label='Next'
-              onClick={() => dispatchState({ type: 'NEXT', length: drillData.length })}
-            >
-              <svg width='24' height='24' viewBox='0 0 24 24' style={{ verticalAlign: 'middle' }} aria-hidden='true'>
-                <title>next</title>
-                <path
-                  d='M9 6l6 6-6 6'
-                  fill='none'
-                  stroke='currentColor'
-                  strokeWidth='2'
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                />
-              </svg>
-            </button>
-          </span>
+          {nextPrev}
         </p>
         {/* biome-ignore lint/a11y/noAutofocus: ignore */}
         <input className={styles.editor} value={state.text} placeholder='Type here' autoFocus onChange={onChange} />
@@ -223,7 +223,7 @@ const Drill = ({ drillData, drillDataIndex }: DrillProps): React.JSX.Element => 
     );
   } else {
     return (
-      <p>
+      <p className={styles.lessonStatus}>
         [{drillData.length} / {drillData.length}]{' '}
         <svg
           xmlns='http://www.w3.org/2000/svg'
@@ -240,6 +240,7 @@ const Drill = ({ drillData, drillDataIndex }: DrillProps): React.JSX.Element => 
           <polyline points='20 6 9 17 4 12' />
         </svg>
         Completed!
+        {nextPrev}
       </p>
     );
   }
