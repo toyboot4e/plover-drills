@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 
+export const id = <T>(x: T): T => x;
+
 export const useLocalStorage = <T>(
   key: string,
   fromLocalStorage: (s: string | null) => T,
