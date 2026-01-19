@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export const id = <T>(x: T): T => x;
 
@@ -21,4 +21,17 @@ export const useLocalStorage = <T>(
   }, [v, key, toLocalStorage]);
 
   return [v, setV];
+};
+
+// TODO: avoid any
+// biome-ignore lint/suspicious/noExplicitAny: ignore
+export const useDebouncedCallback = <T extends (...args: any[]) => void>(callback: T, delay: number) => {
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  return (...args: Parameters<T>) => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    timeoutRef.current = setTimeout(() => {
+      callback(...args);
+    }, delay);
+  };
 };

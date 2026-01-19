@@ -1,11 +1,11 @@
 import type { Combobox } from '@base-ui/react/combobox';
-import { useMemo, useReducer, useRef, useState } from 'react';
+import { useMemo, useReducer, useState } from 'react';
 import styles from './App.module.scss';
 import { MyCheckbox } from './MyCheckbox.tsx';
 import { MyCombobox, type MyComboboxItem } from './MyCombobox.tsx';
 import { OutlineHint } from './Stroke.tsx';
 import './theme.css';
-import { id, useLocalStorage } from './utils.ts';
+import { id, useDebouncedCallback, useLocalStorage } from './utils.ts';
 
 type DrillData = Array<DrillItem>;
 
@@ -141,18 +141,6 @@ const Drill = ({ drillData, drillDataIndex }: DrillProps): React.JSX.Element => 
   const item = drillData[i]!;
   const expected = item.word.trim();
   const accentHint = null;
-
-  // biome-ignore lint/suspicious/noExplicitAny: ignore
-  const useDebouncedCallback = <T extends (...args: any[]) => void>(callback: T, delay: number) => {
-    const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-    return (...args: Parameters<T>) => {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-      timeoutRef.current = setTimeout(() => {
-        callback(...args);
-      }, delay);
-    };
-  };
 
   const onChangeDebounced = useDebouncedCallback((text: string) => {
     if (text === expected) {
