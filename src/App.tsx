@@ -126,20 +126,13 @@ const reduceDrillState = (state: DrillState, action: Action): DrillState => {
   }
 };
 
-const useDrillState = (
-  drillData: DrillData,
-  drillDataIndex: Array<number>,
-): [DrillState, React.Dispatch<DrillState>] => {
-  return useReducer(reduceDrillState, initialDrillState);
-};
-
 type DrillProps = {
   drillData: DrillData;
   drillDataIndex: Array<number>;
 };
 
 const Drill = ({ drillData, drillDataIndex }: DrillProps): React.JSX.Element => {
-  const [state, dispatchState] = useDrillState(drillData, drillDataIndex);
+  const [state, dispatchState] = useReducer(reduceDrillState, initialDrillState);
 
   // FIXME: the dependency array is an anti pattern. Fix it.
   // initialize on prop change
@@ -187,7 +180,11 @@ const Drill = ({ drillData, drillDataIndex }: DrillProps): React.JSX.Element => 
           [{state.drillItemIndex + 1} / {drillData.length}] {expected}
           {accentHint}
           <span className={styles.right}>
-            <button aria-label='Previous' onClick={() => dispatchState({ type: 'PREV', length: drillData.length })}>
+            <button
+              type='button'
+              aria-label='Previous'
+              onClick={() => dispatchState({ type: 'PREV', length: drillData.length })}
+            >
               <svg width='24' height='24' viewBox='0 0 24 24' style={{ verticalAlign: 'middle' }} aria-hidden='true'>
                 <title>previous</title>
                 <path
@@ -200,7 +197,11 @@ const Drill = ({ drillData, drillDataIndex }: DrillProps): React.JSX.Element => 
                 />
               </svg>
             </button>
-            <button aria-label='Next' onClick={() => dispatchState({ type: 'NEXT', length: drillData.length })}>
+            <button
+              type='button'
+              aria-label='Next'
+              onClick={() => dispatchState({ type: 'NEXT', length: drillData.length })}
+            >
               <svg width='24' height='24' viewBox='0 0 24 24' style={{ verticalAlign: 'middle' }} aria-hidden='true'>
                 <title>next</title>
                 <path
