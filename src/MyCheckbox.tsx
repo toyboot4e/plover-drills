@@ -15,7 +15,12 @@ export const MyCheckbox = ({ title, checked, defaultChecked, onCheckedChange }: 
     <>
       {/* biome-ignore lint/a11y/noLabelWithoutControl: ignore */}
       <label className={styles.Label}>
-        <Checkbox.Root checked={checked} defaultChecked={defaultChecked} onCheckedChange={onCheckedChange} className={styles.Checkbox}>
+        <Checkbox.Root
+          checked={checked}
+          defaultChecked={defaultChecked}
+          onCheckedChange={onCheckedChange}
+          className={styles.Checkbox}
+        >
           <Checkbox.Indicator className={styles.Indicator}>
             <CheckIcon className={styles.Icon} />
           </Checkbox.Indicator>
