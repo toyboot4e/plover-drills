@@ -1,4 +1,4 @@
-import { useReducer } from 'react';
+import { Suspense, use, useMemo, useReducer } from 'react';
 import styles from './Drill.module.scss';
 import { OutlineHint } from './Stroke.tsx';
 import './theme.css';
@@ -133,6 +133,48 @@ export type DrillProps = {
   drillDataIndex: Array<number>;
 };
 
+/**
+ * Free dictionary API
+ * https://dictionaryapi.dev/
+ */
+const fetchAccent = async (word: string): Promise<string | null> => {
+  const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`);
+  const data = await res.json();
+
+  if (Array.isArray(data) && data[0].phonetics?.length) {
+    // FIXME: any
+    // @ts-expect-error
+    const american = data[0].phonetics.find((p) => p.audio?.includes('us'));
+    return american?.text || data[0].phonetics[0].text || null;
+  }
+  return null;
+};
+
+const AccentHintInner = ({ resource }: { resource: Promise<string | null> }): React.JSX.Element => {
+  const accent = use(resource);
+  return accent !== null ? (
+    <span className={styles.accentHint}>{accent}</span>
+  ) : (
+    <span className={styles.accentHint}>/Not found/</span>
+  );
+};
+
+type AccentHintProps = {
+  show: boolean;
+  word: string;
+};
+
+const AccentHint = ({ show, word }: AccentHintProps): React.JSX.Element | null => {
+  // important, otherwise loading forever
+  const resource = useMemo(() => fetchAccent(word), [word]);
+  if (!show) return null;
+  return (
+    <Suspense fallback={<span className={styles.accentHint}> /.../</span>}>
+      <AccentHintInner resource={resource} />
+    </Suspense>
+  );
+};
+
 export const Drill = ({ drillData, drillDataIndex }: DrillProps): React.JSX.Element => {
   const [state, dispatchState] = useReducer(reduceDrillState, initialDrillState);
 
@@ -141,7 +183,6 @@ export const Drill = ({ drillData, drillDataIndex }: DrillProps): React.JSX.Elem
   // biome-ignore lint/style/noNonNullAssertion: ignore
   const item = drillData[i]!;
   const expected = item.word.trim();
-  const accentHint = null;
 
   const onChangeDebounced = useDebouncedCallback((text: string) => {
     if (text === expected) {
@@ -197,7 +238,7 @@ export const Drill = ({ drillData, drillDataIndex }: DrillProps): React.JSX.Elem
       <>
         <p className={styles.lessonStatus}>
           [{state.drillItemIndex + 1} / {drillData.length}] {expected}
-          {accentHint}
+          <AccentHint show={state.fail} word={expected} />
           {nextPrev}
         </p>
         {/* biome-ignore lint/a11y/noAutofocus: ignore */}
