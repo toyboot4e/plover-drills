@@ -1,5 +1,5 @@
 import type { Combobox } from '@base-ui/react/combobox';
-import { useReducer, useRef, useState } from 'react';
+import { useEffect, useReducer, useRef, useState } from 'react';
 import styles from './App.module.scss';
 import { MyCheckbox } from './MyCheckbox.tsx';
 import { MyCombobox, type MyComboboxItem } from './MyCombobox.tsx';
@@ -240,14 +240,66 @@ const Drill = ({ drillData, drillDataIndex }: DrillProps): React.JSX.Element => 
   }
 };
 
+const localStorageKeys = {
+  shuffle: 'plover-drills/shuffle',
+  drillName: 'plover-drills/drill-name',
+};
+
+const createDrillDataIndex = (length: number, shuffle: boolean): Array<number> => {
+  const drillDataIndex = [...Array(length)].map((_, i) => i);
+  if (shuffle) {
+    drillDataIndex.sort((_a, _b) => 0.5 - Math.random());
+  }
+  return drillDataIndex;
+};
+
 export const App = (): React.JSX.Element => {
-  // TODO: restore from localStorage
+  // TODO: refactor with useLocalStorage?
 
   // shuffle
-  const [shuffle, setShuffle] = useState(false);
+  const [shuffle, setShuffle] = useState(() => {
+    // restore from localStorage
+    const v = localStorage.getItem(localStorageKeys.shuffle);
+    return v === 'true';
+  });
+
+  // remember the drill restored from localStorage
+  const [defaultShuffle] = useState(() => shuffle);
+
+  // sync to localStorage
+  useEffect(() => {
+    localStorage.setItem(localStorageKeys.shuffle, JSON.stringify(shuffle));
+  }, [shuffle]);
 
   // selector
-  const [drillProps, setDrillProps] = useState<(DrillProps & { filename: string }) | null>(null);
+  const [drillProps, setDrillProps] = useState<(DrillProps & { filename: string }) | null>(() => {
+    // restore from localStorage
+    const filename = localStorage.getItem(localStorageKeys.drillName);
+    if (typeof filename === 'string') {
+      const drill = drills.find(({ name }) => name === filename);
+      if (typeof drill !== 'undefined') {
+        const drillDataIndex = createDrillDataIndex(drill.drillData.length, shuffle);
+        return { drillData: drill.drillData, drillDataIndex, filename };
+      }
+    }
+    return null;
+  });
+
+  // remember the drill restored from localStorage
+  const [defaultDrill] = useState(
+    () => (drillProps && drillItems.find(({ key }) => key === drillProps.filename)) || null,
+  );
+
+  // sync to localStorage
+  useEffect(() => {
+    if (drillProps === null) {
+      // TODO: remove key instead
+      localStorage.setItem(localStorageKeys.drillName, '');
+    } else {
+      localStorage.setItem(localStorageKeys.drillName, drillProps.filename);
+    }
+  }, [drillProps]);
+
   const onValueChange = (
     drillItem: (MyComboboxItem & { drillData: DrillData }) | null,
     _: Combobox.Root.ChangeEventDetails,
@@ -255,10 +307,7 @@ export const App = (): React.JSX.Element => {
     if (drillItem === null) {
       setDrillProps(null);
     } else {
-      const drillDataIndex = [...Array(drillItem.drillData.length)].map((_, i) => i);
-      if (shuffle) {
-        drillDataIndex.sort((_a, _b) => 0.5 - Math.random());
-      }
+      const drillDataIndex = createDrillDataIndex(drillItem.drillData.length, shuffle);
       setDrillProps({ filename: drillItem.key, drillData: drillItem.drillData, drillDataIndex });
     }
   };
@@ -271,6 +320,7 @@ export const App = (): React.JSX.Element => {
           <MyCheckbox
             title='Shuffle'
             checked={shuffle}
+            defaultChecked={defaultShuffle}
             onCheckedChange={(shuffle, _) => {
               setShuffle(shuffle);
             }}
@@ -281,6 +331,7 @@ export const App = (): React.JSX.Element => {
           placeholder='Select a drill'
           emptyString='No drill found'
           width='100%'
+          defaultValue={defaultDrill}
           onValueChange={onValueChange}
         />
         {drillProps && (
