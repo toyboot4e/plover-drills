@@ -4,6 +4,15 @@
   flex: 1;
 }
 
+.lessonStatus {
+  display: flex;
+  align-items: 'center';
+}
+
+.right {
+  margin-left: auto;
+}
+
 // TODO: extend combobox's input instead
 .editor {
   width: 100%;
@@ -58,6 +67,8 @@
 }
 
 .header {
+  font-size: 3.2em;
+  line-height: 1.1;
   text-align: center;
 }
 

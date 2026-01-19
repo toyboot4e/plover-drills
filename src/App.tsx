@@ -183,9 +183,37 @@ const Drill = ({ drillData, drillDataIndex }: DrillProps): React.JSX.Element => 
   if (!state.isCompleted) {
     return (
       <>
-        <p>
+        <p className={styles.lessonStatus}>
           [{state.drillItemIndex + 1} / {drillData.length}] {expected}
           {accentHint}
+          <span className={styles.right}>
+            <button aria-label='Previous' onClick={() => dispatchState({ type: 'PREV', length: drillData.length })}>
+              <svg width='24' height='24' viewBox='0 0 24 24' style={{ verticalAlign: 'middle' }} aria-hidden='true'>
+                <title>previous</title>
+                <path
+                  d='M15 18l-6-6 6-6'
+                  fill='none'
+                  stroke='currentColor'
+                  strokeWidth='2'
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                />
+              </svg>
+            </button>
+            <button aria-label='Next' onClick={() => dispatchState({ type: 'NEXT', length: drillData.length })}>
+              <svg width='24' height='24' viewBox='0 0 24 24' style={{ verticalAlign: 'middle' }} aria-hidden='true'>
+                <title>next</title>
+                <path
+                  d='M9 6l6 6-6 6'
+                  fill='none'
+                  stroke='currentColor'
+                  strokeWidth='2'
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                />
+              </svg>
+            </button>
+          </span>
         </p>
         {/* biome-ignore lint/a11y/noAutofocus: ignore */}
         <input className={styles.editor} value={state.text} placeholder='Type here' autoFocus onChange={onChange} />
@@ -243,7 +271,7 @@ export const App = (): React.JSX.Element => {
     <>
       <h1 className={styles.header}>Plove Drills for Lapwing Theory</h1>
       <main className={styles.main}>
-        <p>
+        <p className={styles.checkboxContainer}>
           <MyCheckbox
             title='Shuffle'
             checked={shuffle}
