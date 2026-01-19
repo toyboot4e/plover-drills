@@ -241,7 +241,7 @@ export const App = (): React.JSX.Element => {
 
   return (
     <>
-      <h1>Plove Drills for Lapwing Theory</h1>
+      <h1 className={styles.header}>Plove Drills for Lapwing Theory</h1>
       <main className={styles.main}>
         <p>
           <MyCheckbox
