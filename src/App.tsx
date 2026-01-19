@@ -59,10 +59,6 @@ const drills: Array<{ name: string; drillData: DrillData }> = Object.entries(dri
     return a.name.localeCompare(b.name, undefined, { numeric: true });
   });
 
-const drillItems: Array<MyComboboxItem & { drillData: DrillData }> = drills.map(({ name, drillData }) => {
-  return { key: name, label: name, drillData };
-});
-
 type DrillState = {
   text: string;
   drillItemIndex: number;
@@ -229,17 +225,31 @@ const Drill = ({ drillData, drillDataIndex }: DrillProps): React.JSX.Element => 
   }
 };
 
-const localStorageKeys = {
-  shuffle: 'plover-drills/shuffle',
-  drillName: 'plover-drills/drill-name',
-};
-
 const createDrillDataIndex = (length: number, shuffle: boolean): Array<number> => {
   const drillDataIndex = [...Array(length)].map((_, i) => i);
   if (shuffle) {
     drillDataIndex.sort((_a, _b) => 0.5 - Math.random());
   }
   return drillDataIndex;
+};
+
+const createDrillProps = (shuffle: boolean, drillItem: MyComboboxDrillItem): DrillProps & { filename: string } => {
+  return {
+    drillData: drillItem.drillData,
+    drillDataIndex: createDrillDataIndex(drillItem.drillData.length, shuffle),
+    filename: drillItem.key,
+  };
+};
+
+type MyComboboxDrillItem = MyComboboxItem & { drillData: DrillData };
+
+const combobboxDrillItems: Array<MyComboboxDrillItem> = drills.map(({ name, drillData }) => {
+  return { key: name, label: name, drillData };
+});
+
+const localStorageKeys = {
+  shuffle: 'plover-drills/shuffle',
+  drillName: 'plover-drills/drill-name',
 };
 
 export const App = (): React.JSX.Element => {
@@ -250,20 +260,13 @@ export const App = (): React.JSX.Element => {
 
   // restore other data from the states
   const drill = useMemo<(MyComboboxItem & { drillData: DrillData }) | null>(
-    () => (typeof filename === 'string' ? drillItems.find((d) => d.key === filename) || null : null),
+    () => (typeof filename === 'string' ? combobboxDrillItems.find((d) => d.key === filename) || null : null),
     [filename],
   );
   const [defaultDrill] = useState(() => drill);
 
   const drillProps = useMemo<(DrillProps & { filename: string }) | null>(
-    () =>
-      drill
-        ? {
-            drillData: drill.drillData,
-            drillDataIndex: createDrillDataIndex(drill.drillData.length, shuffle),
-            filename: drill.key,
-          }
-        : null,
+    () => (drill ? createDrillProps(shuffle, drill) : null),
     [drill, shuffle],
   );
 
@@ -289,7 +292,7 @@ export const App = (): React.JSX.Element => {
           />
         </p>
         <MyCombobox
-          items={drillItems}
+          items={combobboxDrillItems}
           placeholder='Select a drill'
           emptyString='No drill found'
           width='100%'
