@@ -193,7 +193,7 @@ export const Drill = ({ drillData, drillDataIndex }: DrillProps): React.JSX.Elem
   }, 100); // 100ms delay
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const text = e.target.value; // TODO: trim?
+    const text = e.target.value;
     dispatchState({ type: 'SET_TEXT', text });
     onChangeDebounced(text);
   };
