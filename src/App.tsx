@@ -115,7 +115,7 @@ const AppImpl = ({
 
   return (
     <>
-      <h1 className={styles.header}>Plove Drills for Lapwing Theory</h1>
+      <h1 className={styles.header}>Plove Drills</h1>
       <main className={styles.main}>
         <p>Select system</p>
         <MyCombobox
