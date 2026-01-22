@@ -15,7 +15,7 @@ export const matchWord = (expected: string, userInput: string): boolean => {
   }
 };
 
-const rawDrillFiles = import.meta.glob('../../drills/*.txt', {
+const rawDrillFiles = import.meta.glob('../../drills/Lapwing/*.txt', {
   query: '?raw',
   eager: true,
 }) as Record<string, { default: string }>;
