@@ -1,5 +1,5 @@
 // word -> translations of prefixes of outlines
-import wordMapData from '../../public/drills-gen.json' with { type: 'json' };
+import wordMapData from '../../public/drills-gen/Lapwing.json' with { type: 'json' };
 
 const generatedWordMap = wordMapData as Record<string, Array<string>>;
 
