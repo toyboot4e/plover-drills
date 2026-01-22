@@ -53,6 +53,17 @@ export const App = (): React.JSX.Element => {
     (s) => systemNames.find((system) => system === s) || defaultSystemName,
     id,
   );
+
+  return <AppImpl systemName={systemName} setSystemName={setSystemName} key={systemName} />;
+};
+
+const AppImpl = ({
+  systemName,
+  setSystemName,
+}: {
+  systemName: SystemName;
+  setSystemName: (systemName: SystemName) => void;
+}): React.JSX.Element => {
   const [defaultSystemItem] = useState(() => systemItems.find(({ key }) => key === systemName) || systemItems[0]);
 
   const [shuffle, setShuffle] = useLocalStorage<boolean>(
