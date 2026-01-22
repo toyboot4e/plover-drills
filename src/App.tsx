@@ -10,9 +10,16 @@ import { id, useLocalStorage } from './utils.ts';
 
 type MyComboboxDrillItem = MyComboboxItem & { drillData: DrillData };
 
-const combobboxDrillItems: Array<MyComboboxDrillItem> = drillFiles.map(({ name, drillData }) => {
-  return { key: name, label: name, drillData };
-});
+const createComboboxDrillItems = (
+  drillFiles: Array<{ name: string; drillData: DrillData }>,
+): Array<MyComboboxDrillItem> =>
+  drillFiles.map(({ name, drillData }) => {
+    return {
+      key: name,
+      label: name,
+      drillData,
+    };
+  });
 
 const createDrillProps = (
   shuffle: boolean,
@@ -27,21 +34,58 @@ const createDrillProps = (
   };
 };
 
-const localStorageKeys = {
-  shuffle: 'plover-drills/shuffle',
-  drillName: 'plover-drills/drill-name',
-};
+type SystemName = 'lapwing' | 'mejiro';
+
+const systemNames: Array<SystemName> = ['lapwing', 'mejiro'];
+const defaultSystemName: SystemName = 'lapwing';
+
+const systemItems: Array<MyComboboxItem> = [
+  { key: 'lapwing', label: 'Lapwing' },
+  { key: 'mejiro', label: 'Mejiro' },
+];
+
+const localStorageKey = (system: SystemName, key: 'shuffle' | 'drill-name'): string => `plover-drills/${system}/${key}`;
 
 export const App = (): React.JSX.Element => {
   // states
-  const [shuffle, setShuffle] = useLocalStorage<boolean>(localStorageKeys.shuffle, (v) => v === 'true', String);
+  const [systemName, setSystemName] = useLocalStorage<SystemName>(
+    'plover-drills/system',
+    (s) => systemNames.find((system) => system === s) || defaultSystemName,
+    id,
+  );
+  const [defaultSystemItem] = useState(() => systemItems.find(({ key }) => key === systemName) || systemItems[0]);
+
+  const [shuffle, setShuffle] = useLocalStorage<boolean>(
+    localStorageKey(systemName, 'shuffle'),
+    (v) => v === 'true',
+    String,
+  );
   const [defaultShuffle] = useState(() => shuffle);
-  const [filename, setFilename] = useLocalStorage<string | null>(localStorageKeys.drillName, id, id);
+
+  const [filename, setFilename] = useLocalStorage<string | null>(localStorageKey(systemName, 'drill-name'), id, id);
 
   // restore other data from the states
-  const drill = useMemo<(MyComboboxItem & { drillData: DrillData }) | null>(
-    () => (typeof filename === 'string' ? combobboxDrillItems.find((d) => d.key === filename) || null : null),
-    [filename],
+  const onSystemChange = (drillItem: MyComboboxItem | null, _: Combobox.Root.ChangeEventDetails) => {
+    if (drillItem !== null) {
+      const systemName = systemNames.find((s) => s === drillItem.key);
+      if (typeof systemName !== 'undefined') {
+        setSystemName(systemName);
+      }
+    }
+  };
+
+  const comboboxDrillItems = useMemo(() => {
+    if (systemName === 'lapwing') {
+      return createComboboxDrillItems(lapwing.drillFiles);
+    } else {
+      // TODO: separate system definition
+      return createComboboxDrillItems(lapwing.drillFiles);
+    }
+  }, [systemName]);
+
+  const drill = useMemo<MyComboboxDrillItem | null>(
+    () => (typeof filename === 'string' ? comboboxDrillItems.find((d) => d.key === filename) || null : null),
+    [comboboxDrillItems, filename],
   );
   const [defaultDrill] = useState(() => drill);
 
@@ -51,7 +95,7 @@ export const App = (): React.JSX.Element => {
     [drill],
   );
 
-  const onValueChange = (
+  const onDrillChange = (
     drillItem: (MyComboboxItem & { drillData: DrillData }) | null,
     _: Combobox.Root.ChangeEventDetails,
   ) => {
@@ -62,9 +106,18 @@ export const App = (): React.JSX.Element => {
     <>
       <h1 className={styles.header}>Plove Drills for Lapwing Theory</h1>
       <main className={styles.main}>
-        <p className={styles.checkboxContainer}>
+        <p>Select system</p>
+        <MyCombobox
+          items={systemItems}
+          width='100%'
+          defaultValue={defaultSystemItem}
+          placeholder={'System'}
+          onValueChange={onSystemChange}
+        />
+        <p className={styles.checkboxContainer} style={{ display: 'flex' }}>
+          Select drill
           <MyCheckbox
-            title='Shuffle'
+            title='Drill'
             checked={shuffle}
             defaultChecked={defaultShuffle}
             onCheckedChange={(shuffle, _) => {
@@ -73,12 +126,12 @@ export const App = (): React.JSX.Element => {
           />
         </p>
         <MyCombobox
-          items={combobboxDrillItems}
+          items={comboboxDrillItems}
           placeholder='Select a drill'
           emptyString='No drill found'
           width='100%'
           defaultValue={defaultDrill}
-          onValueChange={onValueChange}
+          onValueChange={onDrillChange}
         />
         {drillProps && (
           <Drill

@@ -10,8 +10,8 @@ export interface MyComboboxItem {
 
 export type MyComboboxProps<T extends MyComboboxItem> = {
   items: Array<T>;
-  placeholder: string;
-  emptyString: string;
+  placeholder?: string;
+  emptyString?: string;
   width: string;
   defaultValue: T | null;
   onValueChange?: (value: T | null, eventDetails: Combobox.Root.ChangeEventDetails) => void;
