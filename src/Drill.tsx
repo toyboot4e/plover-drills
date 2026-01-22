@@ -1,8 +1,8 @@
 import { Suspense, use, useMemo, useReducer } from 'react';
 import styles from './Drill.module.scss';
-import { OutlineHint } from './Stroke.tsx';
+import { OutlineHint } from './stroke/UniV4';
 import './theme.css';
-import { useDebouncedCallback } from './utils.ts';
+import { useDebouncedCallback } from './utils';
 
 export type DrillItem = {
   word: string;

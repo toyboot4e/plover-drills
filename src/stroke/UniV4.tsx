@@ -1,4 +1,4 @@
-import style from './Stroke.module.scss';
+import style from './UniV4.module.scss';
 
 // Uni V4
 const chars: Array<Array<string>> = [
