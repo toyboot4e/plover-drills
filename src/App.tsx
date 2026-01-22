@@ -4,8 +4,8 @@ import styles from './App.module.scss';
 import { MyCheckbox } from './MyCheckbox.tsx';
 import { MyCombobox, type MyComboboxItem } from './MyCombobox.tsx';
 import './theme.css';
-import { createDrillDataIndex, Drill, type DrillData, type DrillProps } from './Drill';
-import { drillFiles, matchWord } from './drill/Lapwing';
+import { createDrillDataIndex, Drill, type DrillData, type DrillProps, type MatchWord } from './Drill';
+import * as lapwing from './drill/Lapwing';
 import { id, useLocalStorage } from './utils.ts';
 
 type MyComboboxDrillItem = MyComboboxItem & { drillData: DrillData };
@@ -14,7 +14,11 @@ const combobboxDrillItems: Array<MyComboboxDrillItem> = drillFiles.map(({ name, 
   return { key: name, label: name, drillData };
 });
 
-const createDrillProps = (shuffle: boolean, drillItem: MyComboboxDrillItem): DrillProps & { filename: string } => {
+const createDrillProps = (
+  shuffle: boolean,
+  drillItem: MyComboboxDrillItem,
+  matchWord: MatchWord,
+): DrillProps & { filename: string } => {
   return {
     drillData: drillItem.drillData,
     drillDataIndex: createDrillDataIndex(drillItem.drillData.length, shuffle),
@@ -43,7 +47,7 @@ export const App = (): React.JSX.Element => {
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: do not shuffle on toggle
   const drillProps = useMemo<(DrillProps & { filename: string }) | null>(
-    () => (drill ? createDrillProps(shuffle, drill) : null),
+    () => (drill ? createDrillProps(shuffle, drill, lapwing.matchWord) : null),
     [drill],
   );
 

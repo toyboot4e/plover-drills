@@ -83,10 +83,12 @@ export const createDrillDataIndex = (length: number, shuffle: boolean): Array<nu
   return drillDataIndex;
 };
 
+export type MatchWord = (expected: string, userInput: string) => boolean;
+
 export type DrillProps = {
   drillData: DrillData;
   drillDataIndex: Array<number>;
-  matchWord: (expected: string, userInput: string) => boolean;
+  matchWord: MatchWord;
 };
 
 /**
