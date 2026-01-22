@@ -4,7 +4,8 @@ import styles from './App.module.scss';
 import { MyCheckbox } from './MyCheckbox.tsx';
 import { MyCombobox, type MyComboboxItem } from './MyCombobox.tsx';
 import './theme.css';
-import { createDrillDataIndex, Drill, type DrillData, type DrillProps, drillFiles } from './Drill';
+import { createDrillDataIndex, Drill, type DrillData, type DrillProps } from './Drill';
+import { drillFiles, matchWord } from './drill/Lapwing';
 import { id, useLocalStorage } from './utils.ts';
 
 type MyComboboxDrillItem = MyComboboxItem & { drillData: DrillData };
@@ -17,6 +18,7 @@ const createDrillProps = (shuffle: boolean, drillItem: MyComboboxDrillItem): Dri
   return {
     drillData: drillItem.drillData,
     drillDataIndex: createDrillDataIndex(drillItem.drillData.length, shuffle),
+    matchWord,
     filename: drillItem.key,
   };
 };
@@ -78,6 +80,7 @@ export const App = (): React.JSX.Element => {
           <Drill
             drillData={drillProps.drillData}
             drillDataIndex={drillProps.drillDataIndex}
+            matchWord={drillProps.matchWord}
             /* key change = new component (reset state) */
             key={drillProps.filename}
           />
