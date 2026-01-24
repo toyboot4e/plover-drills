@@ -5,7 +5,7 @@ import { MyCheckbox } from './MyCheckbox.tsx';
 import { MyCombobox, type MyComboboxItem } from './MyCombobox.tsx';
 import './theme.css';
 import { createDrillDataIndex, Drill, type DrillData, type DrillProps, type MatchWord } from './Drill';
-import * as lapwing from './drill/Lapwing';
+import { getSystem, type System, type SystemName, systemNames } from './System';
 import { id, useLocalStorage } from './utils.ts';
 
 type MyComboboxDrillItem = MyComboboxItem & { drillData: DrillData };
@@ -34,9 +34,6 @@ const createDrillProps = (
   };
 };
 
-type SystemName = 'lapwing' | 'mejiro';
-
-const systemNames: Array<SystemName> = ['lapwing', 'mejiro'];
 const defaultSystemName: SystemName = 'lapwing';
 
 const systemItems: Array<MyComboboxItem> = [
@@ -85,14 +82,10 @@ const AppImpl = ({
     }
   };
 
+  const system: System = getSystem(systemName);
   const comboboxDrillItems = useMemo(() => {
-    if (systemName === 'lapwing') {
-      return createComboboxDrillItems(lapwing.drillFiles);
-    } else {
-      // TODO: separate system definition
-      return createComboboxDrillItems(lapwing.drillFiles);
-    }
-  }, [systemName]);
+    return createComboboxDrillItems(system.drillFiles);
+  }, [system]);
 
   const drill = useMemo<MyComboboxDrillItem | null>(
     () => (typeof filename === 'string' ? comboboxDrillItems.find((d) => d.key === filename) || null : null),
@@ -102,7 +95,7 @@ const AppImpl = ({
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: do not shuffle on toggle
   const drillProps = useMemo<(DrillProps & { filename: string }) | null>(
-    () => (drill ? createDrillProps(shuffle, drill, lapwing.matchWord) : null),
+    () => (drill ? createDrillProps(shuffle, drill, system.matchWord) : null),
     [drill],
   );
 
@@ -154,12 +147,7 @@ const AppImpl = ({
           />
         )}
       </main>
-      <footer className={styles.footer}>
-        <p>
-          This is a third-party app for <a href='https://lapwing.aerick.ca/'>Lapwing for Beginners</a>. Every lesson
-          data comes from the book.
-        </p>
-      </footer>
+      <system.Footer className={styles.footer} />
     </>
   );
 };

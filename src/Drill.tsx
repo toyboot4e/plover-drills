@@ -85,12 +85,6 @@ export const createDrillDataIndex = (length: number, shuffle: boolean): Array<nu
 
 export type MatchWord = (expected: string, userInput: string) => boolean;
 
-export type DrillProps = {
-  drillData: DrillData;
-  drillDataIndex: Array<number>;
-  matchWord: MatchWord;
-};
-
 /**
  * Free dictionary API
  * https://dictionaryapi.dev/
@@ -131,6 +125,12 @@ const AccentHint = ({ show, word }: AccentHintProps): React.JSX.Element | null =
       <AccentHintInner resource={resource} />
     </Suspense>
   );
+};
+
+export type DrillProps = {
+  drillData: DrillData;
+  drillDataIndex: Array<number>;
+  matchWord: MatchWord;
 };
 
 export const Drill = ({ drillData, drillDataIndex, matchWord }: DrillProps): React.JSX.Element => {

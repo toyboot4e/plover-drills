@@ -1,10 +1,11 @@
 // word -> translations of prefixes of outlines
 import wordMapData from '../../public/drills-gen/Lapwing.json' with { type: 'json' };
 import type { DrillData } from '../Drill';
+import type { System } from '../System';
 
 const generatedWordMap = wordMapData as Record<string, Array<string>>;
 
-export const matchWord = (expected: string, userInput: string): boolean => {
+const matchWord = (expected: string, userInput: string): boolean => {
   const prefixes = generatedWordMap[expected];
   if (typeof prefixes !== 'undefined') {
     // TODO: Is this deep comparison?
@@ -21,7 +22,7 @@ const rawDrillFiles = import.meta.glob('../../drills/Lapwing/*.txt', {
   eager: true,
 }) as Record<string, { default: string }>;
 
-export const drillFiles: Array<{ name: string; drillData: DrillData }> = Object.entries(rawDrillFiles)
+const drillFiles: Array<{ name: string; drillData: DrillData }> = Object.entries(rawDrillFiles)
   .map(([path, text]) => {
     const drillData: DrillData = text.default
       .trim()
@@ -43,3 +44,20 @@ export const drillFiles: Array<{ name: string; drillData: DrillData }> = Object.
   .sort((a, b) => {
     return a.name.localeCompare(b.name, undefined, { numeric: true });
   });
+
+const Footer = (props: React.HTMLAttributes<HTMLElement>): React.JSX.Element => {
+  return (
+    <footer {...props}>
+      <p>
+        This is a third-party app for <a href='https://lapwing.aerick.ca/'>Lapwing for Beginners</a>. Every lesson data
+        comes from the book.
+      </p>
+    </footer>
+  );
+};
+
+export const lapwingSystem: System = {
+  matchWord,
+  drillFiles,
+  Footer,
+};
