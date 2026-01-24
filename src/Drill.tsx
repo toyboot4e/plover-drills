@@ -1,6 +1,6 @@
 import { Suspense, use, useMemo, useReducer } from 'react';
 import styles from './Drill.module.scss';
-import { OutlineHint } from './stroke/uniV4';
+import type { OutlineHintProps } from './stroke';
 import './theme.css';
 import { useDebouncedCallback } from './utils';
 
@@ -131,9 +131,10 @@ export type DrillProps = {
   drillData: DrillData;
   drillDataIndex: Array<number>;
   matchWord: MatchWord;
+  OutlineHint: (props: OutlineHintProps) => React.JSX.Element;
 };
 
-export const Drill = ({ drillData, drillDataIndex, matchWord }: DrillProps): React.JSX.Element => {
+export const Drill = ({ drillData, drillDataIndex, matchWord, OutlineHint }: DrillProps): React.JSX.Element => {
   const [state, dispatchState] = useReducer(reduceDrillState, initialDrillState);
 
   // biome-ignore lint/style/noNonNullAssertion: ignore

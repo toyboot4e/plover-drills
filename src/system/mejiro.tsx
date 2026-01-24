@@ -1,7 +1,7 @@
 // word -> translations of prefixes of outlines
 
 import type { DrillData } from '../Drill';
-import * as uni from '../stroke/uniV4';
+import * as mejiro31 from '../stroke/mejiro31';
 import type { System } from '../system';
 import { generateDrills } from './utils';
 
@@ -32,6 +32,6 @@ export const mejiroSystem: System = {
   matchWord,
   drillFiles,
   Footer,
-  Stroke: uni.Stroke,
-  OutlineHint: uni.OutlineHint,
+  Stroke: mejiro31.Stroke,
+  OutlineHint: mejiro31.OutlineHint,
 };

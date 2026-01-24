@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react';
 import styles from './App.module.scss';
 import { MyCheckbox } from './MyCheckbox.tsx';
 import { MyCombobox, type MyComboboxItem } from './MyCombobox.tsx';
+import type { OutlineHintProps } from './stroke';
 import './theme.css';
 import { createDrillDataIndex, Drill, type DrillData, type DrillProps, type MatchWord } from './Drill';
 import { getSystem, type System, type SystemName, systemNames } from './system';
@@ -25,11 +26,15 @@ const createDrillProps = (
   shuffle: boolean,
   drillItem: MyComboboxDrillItem,
   matchWord: MatchWord,
-): DrillProps & { filename: string } => {
+  OutlineHint: (props: OutlineHintProps) => React.JSX.Element,
+): DrillProps & {
+  filename: string;
+} => {
   return {
     drillData: drillItem.drillData,
     drillDataIndex: createDrillDataIndex(drillItem.drillData.length, shuffle),
     matchWord,
+    OutlineHint,
     filename: drillItem.key,
   };
 };
@@ -95,7 +100,7 @@ const AppImpl = ({
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: do not shuffle on toggle
   const drillProps = useMemo<(DrillProps & { filename: string }) | null>(
-    () => (drill ? createDrillProps(shuffle, drill, system.matchWord) : null),
+    () => (drill ? createDrillProps(shuffle, drill, system.matchWord, system.OutlineHint) : null),
     [drill],
   );
 
@@ -142,6 +147,7 @@ const AppImpl = ({
             drillData={drillProps.drillData}
             drillDataIndex={drillProps.drillDataIndex}
             matchWord={drillProps.matchWord}
+            OutlineHint={drillProps.OutlineHint}
             /* key change = new component (reset state) */
             key={drillProps.filename}
           />
