@@ -110,7 +110,7 @@ const AppImpl = ({
     <>
       <h1 className={styles.header}>Plove Drills</h1>
       <main className={styles.main}>
-        <p>Select system</p>
+        <p>Choose your system</p>
         <MyCombobox
           items={systemItems}
           width='100%'
@@ -119,9 +119,9 @@ const AppImpl = ({
           onValueChange={onSystemChange}
         />
         <p className={styles.checkboxContainer} style={{ display: 'flex' }}>
-          Select drill
+          Choose your drill
           <MyCheckbox
-            title='Drill'
+            title='Shuffle'
             checked={shuffle}
             defaultChecked={defaultShuffle}
             onCheckedChange={(shuffle, _) => {
@@ -131,7 +131,7 @@ const AppImpl = ({
         </p>
         <MyCombobox
           items={comboboxDrillItems}
-          placeholder='Select a drill'
+          placeholder='Drill'
           emptyString='No drill found'
           width='100%'
           defaultValue={defaultDrill}
