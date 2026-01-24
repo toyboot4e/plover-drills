@@ -5,7 +5,7 @@ import { MyCheckbox } from './MyCheckbox.tsx';
 import { MyCombobox, type MyComboboxItem } from './MyCombobox.tsx';
 import './theme.css';
 import { createDrillDataIndex, Drill, type DrillData, type DrillProps, type MatchWord } from './Drill';
-import { getSystem, type System, type SystemName, systemNames } from './System';
+import { getSystem, type System, type SystemName, systemNames } from './system';
 import { id, useLocalStorage } from './utils.ts';
 
 type MyComboboxDrillItem = MyComboboxItem & { drillData: DrillData };

@@ -1,6 +1,6 @@
 import { Suspense, use, useMemo, useReducer } from 'react';
 import styles from './Drill.module.scss';
-import { OutlineHint } from './stroke/UniV4';
+import { OutlineHint } from './stroke/uniV4';
 import './theme.css';
 import { useDebouncedCallback } from './utils';
 

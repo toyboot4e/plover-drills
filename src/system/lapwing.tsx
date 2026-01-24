@@ -2,7 +2,8 @@
 
 import wordMapData from '../../public/drills-gen/Lapwing.json' with { type: 'json' };
 import type { DrillData } from '../Drill';
-import type { System } from '../System';
+import * as uni from '../stroke/uniV4';
+import type { System } from '../system';
 import { generateDrills } from './utils';
 
 const generatedWordMap = wordMapData as Record<string, Array<string>>;
@@ -43,4 +44,6 @@ export const lapwingSystem: System = {
   matchWord,
   drillFiles,
   Footer,
+  Stroke: uni.Stroke,
+  OutlineHint: uni.OutlineHint,
 };

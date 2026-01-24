@@ -1,7 +1,8 @@
 // word -> translations of prefixes of outlines
 
 import type { DrillData } from '../Drill';
-import type { System } from '../System';
+import * as uni from '../stroke/uniV4';
+import type { System } from '../system';
 import { generateDrills } from './utils';
 
 const matchWord = (expected: string, userInput: string): boolean => {
@@ -9,7 +10,7 @@ const matchWord = (expected: string, userInput: string): boolean => {
 };
 
 const drillFiles: Array<{ name: string; drillData: DrillData }> = (() => {
-  const rawDrillFiles = import.meta.glob('../../drills/Lapwing/*.txt', {
+  const rawDrillFiles = import.meta.glob('../../drills/Mejiro/*.txt', {
     query: '?raw',
     eager: true,
   }) as Record<string, { default: string }>;
@@ -27,8 +28,10 @@ const Footer = (props: React.HTMLAttributes<HTMLElement>): React.JSX.Element => 
   );
 };
 
-export const lapwingSystem: System = {
+export const mejiroSystem: System = {
   matchWord,
   drillFiles,
   Footer,
+  Stroke: uni.Stroke,
+  OutlineHint: uni.OutlineHint,
 };

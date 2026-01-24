@@ -1,4 +1,5 @@
-import style from './UniV4.module.scss';
+import type { OutlineHintProps, StrokeProps } from '../stroke';
+import style from './uniV4.module.scss';
 
 // Uni V4
 const chars: Array<Array<string>> = [
@@ -82,10 +83,6 @@ const collectKeyPress = (chars: Array<Array<string>>, stroke: string): Array<Arr
   return ret;
 };
 
-export type StrokeProps = {
-  stroke: string;
-};
-
 export const Stroke = ({ stroke }: StrokeProps): React.JSX.Element => {
   const isPressed = collectKeyPress(chars, stroke);
   const keys = chars.flatMap((cs, row) => {
@@ -104,10 +101,6 @@ export const Stroke = ({ stroke }: StrokeProps): React.JSX.Element => {
   });
 
   return <div className={style.stenoVizStroke}>{keys}</div>;
-};
-
-export type OutlineHintProps = {
-  outline: Array<string>;
 };
 
 export const OutlineHint = ({ outline }: OutlineHintProps): React.JSX.Element => {
