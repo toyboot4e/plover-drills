@@ -1,1 +1,10 @@
-あ	あ
+あ	A
+い	I
+う	U
+え	IA
+お	AU
+あ	A
+か	KA
+さ	SA
+た	TA
+な	NA
