@@ -34,4 +34,5 @@ export const mejiroSystem: System = {
   Footer,
   Stroke: mejiro31.Stroke,
   OutlineHint: mejiro31.OutlineHint,
+  AccentHint: mejiro31.AccentHint,
 };

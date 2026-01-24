@@ -3,7 +3,7 @@ import { useMemo, useState } from 'react';
 import styles from './App.module.scss';
 import { MyCheckbox } from './MyCheckbox.tsx';
 import { MyCombobox, type MyComboboxItem } from './MyCombobox.tsx';
-import type { OutlineHintProps } from './stroke';
+import type { AccentHintProps, OutlineHintProps } from './stroke';
 import './theme.css';
 import { createDrillDataIndex, Drill, type DrillData, type DrillProps, type MatchWord } from './Drill';
 import { getSystem, type System, type SystemName, systemNames } from './system';
@@ -27,15 +27,17 @@ const createDrillProps = (
   drillItem: MyComboboxDrillItem,
   matchWord: MatchWord,
   OutlineHint: (props: OutlineHintProps) => React.JSX.Element,
-): DrillProps & {
-  filename: string;
-} => {
+  AccentHint: (props: AccentHintProps) => React.JSX.Element | null,
+): { drillProps: DrillProps; fileName: string } => {
   return {
-    drillData: drillItem.drillData,
-    drillDataIndex: createDrillDataIndex(drillItem.drillData.length, shuffle),
-    matchWord,
-    OutlineHint,
-    filename: drillItem.key,
+    drillProps: {
+      drillData: drillItem.drillData,
+      drillDataIndex: createDrillDataIndex(drillItem.drillData.length, shuffle),
+      matchWord,
+      OutlineHint,
+      AccentHint,
+    },
+    fileName: drillItem.key,
   };
 };
 
@@ -99,8 +101,8 @@ const AppImpl = ({
   const [defaultDrill] = useState(() => drill);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: do not shuffle on toggle
-  const drillProps = useMemo<(DrillProps & { filename: string }) | null>(
-    () => (drill ? createDrillProps(shuffle, drill, system.matchWord, system.OutlineHint) : null),
+  const drillProps = useMemo<{ drillProps: DrillProps; fileName: string } | null>(
+    () => (drill ? createDrillProps(shuffle, drill, system.matchWord, system.OutlineHint, system.AccentHint) : null),
     [drill],
   );
 
@@ -142,16 +144,7 @@ const AppImpl = ({
           defaultValue={defaultDrill}
           onValueChange={onDrillChange}
         />
-        {drillProps && (
-          <Drill
-            drillData={drillProps.drillData}
-            drillDataIndex={drillProps.drillDataIndex}
-            matchWord={drillProps.matchWord}
-            OutlineHint={drillProps.OutlineHint}
-            /* key change = new component (reset state) */
-            key={drillProps.filename}
-          />
-        )}
+        {drillProps && <Drill {...drillProps.drillProps} key={drillProps.fileName} />}
       </main>
       <system.Footer className={styles.footer} />
     </>

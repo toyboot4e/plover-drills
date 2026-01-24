@@ -1,4 +1,4 @@
-import type { OutlineHintProps, StrokeProps } from '../stroke';
+import type { AccentHintProps, OutlineHintProps, StrokeProps } from '../stroke';
 import style from './style.module.scss';
 
 // Uni V4
@@ -70,7 +70,6 @@ export const Stroke = ({ stroke }: StrokeProps): React.JSX.Element => {
   const isPressed = collectKeyPress(chars, stroke);
   const keys = chars.flatMap((cs, row) => {
     return cs.map((c, col) => {
-      // TODO: fat direction
       const fat = ('#*S'.includes(c) && style.stenoVizFatY) || (c === 'n' && style.stenoVizFatX);
       return (
         <div
@@ -97,4 +96,8 @@ export const OutlineHint = ({ outline }: OutlineHintProps): React.JSX.Element =>
       ))}
     </div>
   );
+};
+
+export const AccentHint = (_: AccentHintProps): React.JSX.Element | null => {
+  return null;
 };

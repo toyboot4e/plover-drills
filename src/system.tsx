@@ -1,5 +1,5 @@
 import type { DrillData, MatchWord } from './Drill';
-import type { OutlineHintProps, StrokeProps } from './stroke';
+import type { AccentHintProps, OutlineHintProps, StrokeProps } from './stroke';
 import { lapwingSystem } from './system/lapwing';
 import { mejiroSystem } from './system/mejiro';
 
@@ -16,6 +16,7 @@ export type System = {
   Footer: (props: React.HTMLAttributes<HTMLElement>) => React.JSX.Element;
   Stroke: (props: StrokeProps) => React.JSX.Element;
   OutlineHint: (props: OutlineHintProps) => React.JSX.Element;
+  AccentHint: (props: AccentHintProps) => React.JSX.Element | null;
 };
 
 export const getSystem = (systemName: SystemName): System => {

@@ -1,4 +1,5 @@
-import type { OutlineHintProps, StrokeProps } from '../stroke';
+import { Suspense, use, useMemo } from 'react';
+import type { AccentHintProps, OutlineHintProps, StrokeProps } from '../stroke';
 import style from './style.module.scss';
 
 // Uni V4
@@ -111,5 +112,42 @@ export const OutlineHint = ({ outline }: OutlineHintProps): React.JSX.Element =>
         <Stroke key={i} stroke={stroke} />
       ))}
     </div>
+  );
+};
+
+/**
+ * Free dictionary API
+ * https://dictionaryapi.dev/
+ */
+const fetchAccent = async (word: string): Promise<string | null> => {
+  const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`);
+  const data = await res.json();
+
+  if (Array.isArray(data) && data[0].phonetics?.length) {
+    // FIXME: any
+    // @ts-expect-error
+    const american = data[0].phonetics.find((p) => p.audio?.includes('us'));
+    return american?.text || data[0].phonetics[0].text || null;
+  }
+  return null;
+};
+
+const AccentHintInner = ({ resource }: { resource: Promise<string | null> }): React.JSX.Element => {
+  const accent = use(resource);
+  return accent !== null ? (
+    <span className={style.accentHint}>{accent}</span>
+  ) : (
+    <span className={style.accentHint}>/Not found/</span>
+  );
+};
+
+export const AccentHint = ({ show, word }: AccentHintProps): React.JSX.Element | null => {
+  // important, otherwise loading forever
+  const resource = useMemo(() => fetchAccent(word), [word]);
+  if (!show) return null;
+  return (
+    <Suspense fallback={<span className={style.accentHint}> /.../</span>}>
+      <AccentHintInner resource={resource} />
+    </Suspense>
   );
 };

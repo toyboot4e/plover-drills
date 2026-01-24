@@ -1,6 +1,6 @@
-import { Suspense, use, useMemo, useReducer } from 'react';
+import { useReducer } from 'react';
 import styles from './Drill.module.scss';
-import type { OutlineHintProps } from './stroke';
+import type { AccentHintProps, OutlineHintProps } from './stroke';
 import './theme.css';
 import { useDebouncedCallback } from './utils';
 
@@ -85,56 +85,21 @@ export const createDrillDataIndex = (length: number, shuffle: boolean): Array<nu
 
 export type MatchWord = (expected: string, userInput: string) => boolean;
 
-/**
- * Free dictionary API
- * https://dictionaryapi.dev/
- */
-const fetchAccent = async (word: string): Promise<string | null> => {
-  const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`);
-  const data = await res.json();
-
-  if (Array.isArray(data) && data[0].phonetics?.length) {
-    // FIXME: any
-    // @ts-expect-error
-    const american = data[0].phonetics.find((p) => p.audio?.includes('us'));
-    return american?.text || data[0].phonetics[0].text || null;
-  }
-  return null;
-};
-
-const AccentHintInner = ({ resource }: { resource: Promise<string | null> }): React.JSX.Element => {
-  const accent = use(resource);
-  return accent !== null ? (
-    <span className={styles.accentHint}>{accent}</span>
-  ) : (
-    <span className={styles.accentHint}>/Not found/</span>
-  );
-};
-
-type AccentHintProps = {
-  show: boolean;
-  word: string;
-};
-
-const AccentHint = ({ show, word }: AccentHintProps): React.JSX.Element | null => {
-  // important, otherwise loading forever
-  const resource = useMemo(() => fetchAccent(word), [word]);
-  if (!show) return null;
-  return (
-    <Suspense fallback={<span className={styles.accentHint}> /.../</span>}>
-      <AccentHintInner resource={resource} />
-    </Suspense>
-  );
-};
-
 export type DrillProps = {
   drillData: DrillData;
   drillDataIndex: Array<number>;
   matchWord: MatchWord;
   OutlineHint: (props: OutlineHintProps) => React.JSX.Element;
+  AccentHint: (props: AccentHintProps) => React.JSX.Element | null;
 };
 
-export const Drill = ({ drillData, drillDataIndex, matchWord, OutlineHint }: DrillProps): React.JSX.Element => {
+export const Drill = ({
+  drillData,
+  drillDataIndex,
+  matchWord,
+  OutlineHint,
+  AccentHint,
+}: DrillProps): React.JSX.Element => {
   const [state, dispatchState] = useReducer(reduceDrillState, initialDrillState);
 
   // biome-ignore lint/style/noNonNullAssertion: ignore

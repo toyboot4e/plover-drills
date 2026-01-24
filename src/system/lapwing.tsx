@@ -46,4 +46,5 @@ export const lapwingSystem: System = {
   Footer,
   Stroke: uni.Stroke,
   OutlineHint: uni.OutlineHint,
+  AccentHint: uni.AccentHint,
 };

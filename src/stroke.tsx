@@ -5,3 +5,8 @@ export type StrokeProps = {
 export type OutlineHintProps = {
   outline: Array<string>;
 };
+
+export type AccentHintProps = {
+  show: boolean;
+  word: string;
+};
