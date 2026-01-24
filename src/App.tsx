@@ -119,7 +119,7 @@ const AppImpl = ({
           onValueChange={onSystemChange}
         />
         <p className={styles.checkboxContainer} style={{ display: 'flex' }}>
-          Choose your drill
+          <span style={{ paddingRight: '10px' }}>Choose your drill</span>
           <MyCheckbox
             title='Shuffle'
             checked={shuffle}
