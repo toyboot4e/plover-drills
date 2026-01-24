@@ -32,11 +32,24 @@
   background: #4a90e2;
 }
 
-.stenoVizFat {
+.stenoVizFatX {
+  width: 66px;
+  height: 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: stretch;
+  align-items: stretch;
+}
+
+.stenoVizFatY {
   width: 32px;
   height: 66px; /* 32 + 4 + 32 */
   display: flex;
   flex-direction: column;
   justify-content: stretch;
   align-items: stretch;
+}
+
+.accentHint {
+    padding-left: 0.5em;
 }

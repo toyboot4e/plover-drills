@@ -3,7 +3,7 @@
   "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
   "files": {
     // TODO: SCSS format with biome
-    "includes": ["**/*.{js,jsx,ts,tsx,html,css,scss,json,jsonc}", "!!**/drills-gen.json"]
+    "includes": ["**/*.{js,jsx,ts,tsx,html,css,scss,json,jsonc}", "!!**/drills-gen"]
   },
   "formatter": {
     "enabled": true,

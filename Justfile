@@ -10,7 +10,7 @@ download:
     git clone --no-checkout --depth=1 --filter=blob:none https://github.com/aerickt/lapwing-for-beginners.git .tmp-lapwing
     # TODO: Write it in multiple lines
     cd .tmp-lapwing && git sparse-checkout init --cone && git sparse-checkout set src/practice && git checkout main
-    mv .tmp-lapwing/src/practice drills
+    mv .tmp-lapwing/src/practice drills/Lapwing
     rm -rf .tmp-lapwing
 
 [private]
@@ -18,7 +18,7 @@ alias dl := download
 
 # generates `drills-gen.json`
 generate-drills-json:
-    cd gen && uv run gen.py > ../public/drills-gen.json
+    cd gen && uv run gen.py > ../public/drills-gen/Lapwing.json
 
 # runs the app on dev srever at localhost:5173
 dev:

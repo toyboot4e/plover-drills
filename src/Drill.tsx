@@ -1,8 +1,8 @@
-import { Suspense, use, useMemo, useReducer } from 'react';
+import { useReducer } from 'react';
 import styles from './Drill.module.scss';
-import { OutlineHint } from './Stroke.tsx';
+import type { AccentHintProps, OutlineHintProps } from './stroke';
 import './theme.css';
-import { useDebouncedCallback } from './utils.ts';
+import { useDebouncedCallback } from './utils';
 
 export type DrillItem = {
   word: string;
@@ -10,51 +10,6 @@ export type DrillItem = {
 };
 
 export type DrillData = Array<DrillItem>;
-
-// word -> translations of prefixes of outlines
-import wordMapData from '../public/drills-gen.json' with { type: 'json' };
-
-const generatedWordMap = wordMapData as Record<string, Array<string>>;
-
-const matchWord = (expected: string, userInput: string): boolean => {
-  const prefixes = generatedWordMap[expected];
-  if (typeof prefixes !== 'undefined') {
-    // TODO: Is this deep comparison?
-    return prefixes.some((p) => p === userInput);
-  } else {
-    // needs regeneration of `drills-gen.json`
-    console.log(`error: non-registerd word '${expected}' was looked up`);
-    return false;
-  }
-};
-
-const rawDrillFiles = import.meta.glob('../drills/*.txt', {
-  query: '?raw',
-  eager: true,
-}) as Record<string, { default: string }>;
-
-export const drillFiles: Array<{ name: string; drillData: DrillData }> = Object.entries(rawDrillFiles)
-  .map(([path, text]) => {
-    const drillData: DrillData = text.default
-      .trim()
-      .split('\n')
-      .map((line) => {
-        const columns = line.split('\t');
-        return {
-          word: columns[0],
-          outline: columns[1].split('/'),
-        };
-      });
-
-    return {
-      // biome-ignore lint/style/noNonNullAssertion: ignore
-      name: path.split('/').pop()!,
-      drillData,
-    };
-  })
-  .sort((a, b) => {
-    return a.name.localeCompare(b.name, undefined, { numeric: true });
-  });
 
 export type DrillState = {
   text: string;
@@ -128,54 +83,23 @@ export const createDrillDataIndex = (length: number, shuffle: boolean): Array<nu
   return drillDataIndex;
 };
 
+export type MatchWord = (expected: string, userInput: string) => boolean;
+
 export type DrillProps = {
   drillData: DrillData;
   drillDataIndex: Array<number>;
+  matchWord: MatchWord;
+  OutlineHint: (props: OutlineHintProps) => React.JSX.Element;
+  AccentHint: (props: AccentHintProps) => React.JSX.Element | null;
 };
 
-/**
- * Free dictionary API
- * https://dictionaryapi.dev/
- */
-const fetchAccent = async (word: string): Promise<string | null> => {
-  const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`);
-  const data = await res.json();
-
-  if (Array.isArray(data) && data[0].phonetics?.length) {
-    // FIXME: any
-    // @ts-expect-error
-    const american = data[0].phonetics.find((p) => p.audio?.includes('us'));
-    return american?.text || data[0].phonetics[0].text || null;
-  }
-  return null;
-};
-
-const AccentHintInner = ({ resource }: { resource: Promise<string | null> }): React.JSX.Element => {
-  const accent = use(resource);
-  return accent !== null ? (
-    <span className={styles.accentHint}>{accent}</span>
-  ) : (
-    <span className={styles.accentHint}>/Not found/</span>
-  );
-};
-
-type AccentHintProps = {
-  show: boolean;
-  word: string;
-};
-
-const AccentHint = ({ show, word }: AccentHintProps): React.JSX.Element | null => {
-  // important, otherwise loading forever
-  const resource = useMemo(() => fetchAccent(word), [word]);
-  if (!show) return null;
-  return (
-    <Suspense fallback={<span className={styles.accentHint}> /.../</span>}>
-      <AccentHintInner resource={resource} />
-    </Suspense>
-  );
-};
-
-export const Drill = ({ drillData, drillDataIndex }: DrillProps): React.JSX.Element => {
+export const Drill = ({
+  drillData,
+  drillDataIndex,
+  matchWord,
+  OutlineHint,
+  AccentHint,
+}: DrillProps): React.JSX.Element => {
   const [state, dispatchState] = useReducer(reduceDrillState, initialDrillState);
 
   // biome-ignore lint/style/noNonNullAssertion: ignore
