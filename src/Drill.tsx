@@ -39,7 +39,7 @@ const reduceDrillState = (state: DrillState, action: Action): DrillState => {
   const newState = reduceDrillStateImpl(state, action);
   state.setDrillItemIndex(newState.drillItemIndex);
   return newState;
-}
+};
 
 const reduceDrillStateImpl = (state: DrillState, action: Action): DrillState => {
   switch (action.type) {
@@ -113,7 +113,8 @@ export const Drill = ({
 }: DrillProps): React.JSX.Element => {
   const inits = useLocalStorage<number>(drillItemIndexKey, Number, String);
   const [state, dispatchState] = useReducer(reduceDrillState, inits, ([drillItemIndex, setDrillItemIndex]) => {
-    return createInitialDrillState(drillItemIndex, setDrillItemIndex);
+    const index = Math.max(0, Math.min(drillData.length - 1, drillItemIndex));
+    return createInitialDrillState(index, setDrillItemIndex);
   });
 
   // biome-ignore lint/style/noNonNullAssertion: ignore
