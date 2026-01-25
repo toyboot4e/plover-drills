@@ -24,6 +24,7 @@ const createComboboxDrillItems = (
 
 const createDrillProps = (
   shuffle: boolean,
+  shuffleSeed: number,
   drillItem: MyComboboxDrillItem,
   matchWord: MatchWord,
   OutlineHint: (props: OutlineHintProps) => React.JSX.Element,
@@ -32,7 +33,7 @@ const createDrillProps = (
   return {
     drillProps: {
       drillData: drillItem.drillData,
-      drillDataIndex: createDrillDataIndex(drillItem.drillData.length, shuffle),
+      drillDataIndex: createDrillDataIndex(drillItem.drillData.length, shuffle, shuffleSeed),
       matchWord,
       OutlineHint,
       AccentHint,
@@ -48,7 +49,7 @@ const systemItems: Array<MyComboboxItem> = [
   { key: 'mejiro', label: 'Mejiro' },
 ];
 
-const localStorageKey = (system: SystemName, key: 'shuffle' | 'drill-name'): string => `plover-drills/${system}/${key}`;
+const localStorageKey = (system: SystemName, key: string): string => `plover-drills/${system}/${key}`;
 
 export const App = (): React.JSX.Element => {
   // states
@@ -77,6 +78,13 @@ const AppImpl = ({
   );
   const [defaultShuffle] = useState(() => shuffle);
 
+  const [shuffleSeed, setShuffleSeed] = useLocalStorage<number>(
+    localStorageKey(systemName, 'shuffle-seed'),
+    (s) => (s === null ? Math.random() : Number(s)),
+    String,
+  );
+  console.log(`seed: ${shuffleSeed}`);
+
   const [filename, setFilename] = useLocalStorage<string | null>(localStorageKey(systemName, 'drill-name'), id, id);
 
   // restore other data from the states
@@ -102,15 +110,19 @@ const AppImpl = ({
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: do not shuffle on toggle
   const drillProps = useMemo<{ drillProps: DrillProps; fileName: string } | null>(
-    () => (drill ? createDrillProps(shuffle, drill, system.matchWord, system.OutlineHint, system.AccentHint) : null),
+    () =>
+      drill
+        ? createDrillProps(shuffle, shuffleSeed, drill, system.matchWord, system.OutlineHint, system.AccentHint)
+        : null,
     [drill],
   );
 
-  const onDrillChange = (
+  const onChangeDrill = (
     drillItem: (MyComboboxItem & { drillData: DrillData }) | null,
     _: Combobox.Root.ChangeEventDetails,
   ) => {
     setFilename(drillItem?.key ?? null);
+    setShuffleSeed(Math.random());
   };
 
   return (
@@ -142,7 +154,7 @@ const AppImpl = ({
           emptyString='No drill found'
           width='100%'
           defaultValue={defaultDrill}
-          onValueChange={onDrillChange}
+          onValueChange={onChangeDrill}
         />
         {drillProps && <Drill {...drillProps.drillProps} key={drillProps.fileName} />}
       </main>

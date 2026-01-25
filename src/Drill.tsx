@@ -2,7 +2,7 @@ import { useReducer } from 'react';
 import styles from './Drill.module.scss';
 import type { AccentHintProps, OutlineHintProps } from './stroke';
 import './theme.css';
-import { useDebouncedCallback } from './utils';
+import { shuffleArray, useDebouncedCallback } from './utils';
 
 export type DrillItem = {
   word: string;
@@ -75,10 +75,10 @@ export const reduceDrillState = (state: DrillState, action: Action): DrillState 
   }
 };
 
-export const createDrillDataIndex = (length: number, shuffle: boolean): Array<number> => {
+export const createDrillDataIndex = (length: number, shuffle: boolean, seed: number): Array<number> => {
   const drillDataIndex = [...Array(length)].map((_, i) => i);
   if (shuffle) {
-    drillDataIndex.sort((_a, _b) => 0.5 - Math.random());
+    shuffleArray(drillDataIndex, seed);
   }
   return drillDataIndex;
 };

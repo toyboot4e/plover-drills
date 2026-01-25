@@ -35,3 +35,33 @@ export const useDebouncedCallback = <T extends (...args: any[]) => void>(callbac
     }, delay);
   };
 };
+
+/**
+ * O(n) Sorts an array randomly based on a seed.
+ * https://stackoverflow.com/a/53758827
+ */
+export const shuffleArray = <T>(array: Array<T>, seed: number): Array<T> => {
+  if (array.length === 0) return array;
+
+  let m = array.length;
+  let t = array[0];
+
+  // While there remain elements to shuffle…
+  while (m) {
+    // Pick a remaining element…
+    const i = Math.floor(random(seed) * m--);
+    seed += 1;
+
+    // And swap it with the current element.
+    t = array[m];
+    array[m] = array[i];
+    array[i] = t;
+  }
+
+  return array;
+};
+
+const random = (seed: number): number => {
+  var x = Math.sin(seed) * 10000;
+  return x - Math.floor(x);
+};
