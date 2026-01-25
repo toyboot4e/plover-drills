@@ -26,6 +26,7 @@ const createDrillProps = (
   shuffle: boolean,
   shuffleSeed: number,
   drillItem: MyComboboxDrillItem,
+  drillItemIndexKey: string,
   matchWord: MatchWord,
   OutlineHint: (props: OutlineHintProps) => React.JSX.Element,
   AccentHint: (props: AccentHintProps) => React.JSX.Element | null,
@@ -34,6 +35,7 @@ const createDrillProps = (
     drillProps: {
       drillData: drillItem.drillData,
       drillDataIndex: createDrillDataIndex(drillItem.drillData.length, shuffle, shuffleSeed),
+      drillItemIndexKey,
       matchWord,
       OutlineHint,
       AccentHint,
@@ -108,11 +110,21 @@ const AppImpl = ({
   );
   const [defaultDrill] = useState(() => drill);
 
+  const drillItemIndexKey = localStorageKey(systemName, 'drill-item-index');
+
   // biome-ignore lint/correctness/useExhaustiveDependencies: do not shuffle on toggle
   const drillProps = useMemo<{ drillProps: DrillProps; fileName: string } | null>(
     () =>
       drill
-        ? createDrillProps(shuffle, shuffleSeed, drill, system.matchWord, system.OutlineHint, system.AccentHint)
+        ? createDrillProps(
+            shuffle,
+            shuffleSeed,
+            drill,
+            drillItemIndexKey,
+            system.matchWord,
+            system.OutlineHint,
+            system.AccentHint,
+          )
         : null,
     [drill],
   );
@@ -123,6 +135,8 @@ const AppImpl = ({
   ) => {
     setFilename(drillItem?.key ?? null);
     setShuffleSeed(Math.random());
+    // Discard the item index state. TODO: This is too hacky.
+    localStorage.removeItem(drillItemIndexKey);
   };
 
   return (

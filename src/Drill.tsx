@@ -2,7 +2,7 @@ import { useReducer } from 'react';
 import styles from './Drill.module.scss';
 import type { AccentHintProps, OutlineHintProps } from './stroke';
 import './theme.css';
-import { shuffleArray, useDebouncedCallback } from './utils';
+import { shuffleArray, useDebouncedCallback, useLocalStorage } from './utils';
 
 export type DrillItem = {
   word: string;
@@ -14,29 +14,35 @@ export type DrillData = Array<DrillItem>;
 export type DrillState = {
   text: string;
   drillItemIndex: number;
+  setDrillItemIndex: (i: number) => void;
   fail: boolean;
   isCompleted: boolean;
 };
 
 export type Action =
-  | { type: 'RESET' }
   | { type: 'SET_TEXT'; text: string }
   | { type: 'FAIL' }
   | { type: 'NEXT'; length: number }
   | { type: 'PREV'; length: number };
 
-export const initialDrillState: DrillState = {
-  text: '',
-  drillItemIndex: 0,
-  fail: false,
-  isCompleted: false,
+const createInitialDrillState = (drillItemIndex: number, setDrillItemIndex: (i: number) => void): DrillState => {
+  return {
+    text: '',
+    drillItemIndex,
+    setDrillItemIndex,
+    fail: false,
+    isCompleted: false,
+  };
 };
 
-export const reduceDrillState = (state: DrillState, action: Action): DrillState => {
-  switch (action.type) {
-    case 'RESET':
-      return initialDrillState;
+const reduceDrillState = (state: DrillState, action: Action): DrillState => {
+  const newState = reduceDrillStateImpl(state, action);
+  state.setDrillItemIndex(newState.drillItemIndex);
+  return newState;
+}
 
+const reduceDrillStateImpl = (state: DrillState, action: Action): DrillState => {
+  switch (action.type) {
     case 'SET_TEXT':
       return { ...state, text: action.text };
 
@@ -48,6 +54,7 @@ export const reduceDrillState = (state: DrillState, action: Action): DrillState 
         text: '',
         fail: false,
         drillItemIndex: Math.min(action.length - 1, state.drillItemIndex + 1),
+        setDrillItemIndex: state.setDrillItemIndex,
         isCompleted: state.drillItemIndex + 1 >= action.length,
       };
     }
@@ -58,12 +65,14 @@ export const reduceDrillState = (state: DrillState, action: Action): DrillState 
             text: '',
             fail: false,
             drillItemIndex: state.drillItemIndex,
+            setDrillItemIndex: state.setDrillItemIndex,
             isCompleted: false,
           }
         : {
             text: '',
             fail: false,
             drillItemIndex: Math.max(0, state.drillItemIndex - 1),
+            setDrillItemIndex: state.setDrillItemIndex,
             isCompleted: false,
           };
     }
@@ -88,6 +97,7 @@ export type MatchWord = (expected: string, userInput: string) => boolean;
 export type DrillProps = {
   drillData: DrillData;
   drillDataIndex: Array<number>;
+  drillItemIndexKey: string;
   matchWord: MatchWord;
   OutlineHint: (props: OutlineHintProps) => React.JSX.Element;
   AccentHint: (props: AccentHintProps) => React.JSX.Element | null;
@@ -96,11 +106,15 @@ export type DrillProps = {
 export const Drill = ({
   drillData,
   drillDataIndex,
+  drillItemIndexKey,
   matchWord,
   OutlineHint,
   AccentHint,
 }: DrillProps): React.JSX.Element => {
-  const [state, dispatchState] = useReducer(reduceDrillState, initialDrillState);
+  const inits = useLocalStorage<number>(drillItemIndexKey, Number, String);
+  const [state, dispatchState] = useReducer(reduceDrillState, inits, ([drillItemIndex, setDrillItemIndex]) => {
+    return createInitialDrillState(drillItemIndex, setDrillItemIndex);
+  });
 
   // biome-ignore lint/style/noNonNullAssertion: ignore
   const i = drillDataIndex[state.drillItemIndex]!;
