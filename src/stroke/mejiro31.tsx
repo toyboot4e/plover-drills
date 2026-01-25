@@ -66,7 +66,6 @@ const collectKeyPress = (chars: Array<Array<string>>, stroke: string): Array<Arr
 };
 
 export const Stroke = ({ stroke }: StrokeProps): React.JSX.Element => {
-  console.log(chars);
   const isPressed = collectKeyPress(chars, stroke);
   const keys = chars.flatMap((cs, row) => {
     return cs.map((c, col) => {

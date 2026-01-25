@@ -27,6 +27,7 @@ const createDrillProps = (
   shuffleSeed: number,
   drillItem: MyComboboxDrillItem,
   drillItemIndexKey: string,
+  alwaysShowKeyboard: boolean,
   matchWord: MatchWord,
   OutlineHint: (props: OutlineHintProps) => React.JSX.Element,
   AccentHint: (props: AccentHintProps) => React.JSX.Element | null,
@@ -36,6 +37,7 @@ const createDrillProps = (
       drillData: drillItem.drillData,
       drillDataIndex: createDrillDataIndex(drillItem.drillData.length, shuffle, shuffleSeed),
       drillItemIndexKey,
+      alwaysShowKeyboard,
       matchWord,
       OutlineHint,
       AccentHint,
@@ -87,6 +89,13 @@ const AppImpl = ({
   );
   console.log(`seed: ${shuffleSeed}`);
 
+  const [alwaysShowKeyboard, setAlwaysShowKeyboard] = useLocalStorage<boolean>(
+    localStorageKey(systemName, 'always-show-keyboard'),
+    (v) => v === 'true',
+    String,
+  );
+  const [defaultAlwaysShowKeyboard] = useState(() => alwaysShowKeyboard);
+
   const [filename, setFilename] = useLocalStorage<string | null>(localStorageKey(systemName, 'drill-name'), id, id);
 
   // restore other data from the states
@@ -121,12 +130,13 @@ const AppImpl = ({
             shuffleSeed,
             drill,
             drillItemIndexKey,
+            alwaysShowKeyboard,
             system.matchWord,
             system.OutlineHint,
             system.AccentHint,
           )
         : null,
-    [drill],
+    [drill, shuffle, shuffleSeed, drill, drillItemIndexKey, alwaysShowKeyboard, system],
   );
 
   const onChangeDrill = (
@@ -159,6 +169,14 @@ const AppImpl = ({
             defaultChecked={defaultShuffle}
             onCheckedChange={(shuffle, _) => {
               setShuffle(shuffle);
+            }}
+          />
+          <MyCheckbox
+            title='Always show keyboard'
+            checked={alwaysShowKeyboard}
+            defaultChecked={defaultAlwaysShowKeyboard}
+            onCheckedChange={(alwaysShowKeyboard, _) => {
+              setAlwaysShowKeyboard(alwaysShowKeyboard);
             }}
           />
         </p>

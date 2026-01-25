@@ -98,6 +98,7 @@ export type DrillProps = {
   drillData: DrillData;
   drillDataIndex: Array<number>;
   drillItemIndexKey: string;
+  alwaysShowKeyboard: boolean;
   matchWord: MatchWord;
   OutlineHint: (props: OutlineHintProps) => React.JSX.Element;
   AccentHint: (props: AccentHintProps) => React.JSX.Element | null;
@@ -107,6 +108,7 @@ export const Drill = ({
   drillData,
   drillDataIndex,
   drillItemIndexKey,
+  alwaysShowKeyboard,
   matchWord,
   OutlineHint,
   AccentHint,
@@ -182,7 +184,7 @@ export const Drill = ({
         </p>
         {/* biome-ignore lint/a11y/noAutofocus: ignore */}
         <input className={styles.editor} value={state.text} placeholder='Type here' autoFocus onChange={onChange} />
-        {state.fail && <OutlineHint outline={item.outline} />}
+        {(state.fail || alwaysShowKeyboard) && <OutlineHint outline={state.fail ? item.outline : ['']} />}
       </>
     );
   } else {
