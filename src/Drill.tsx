@@ -145,6 +145,7 @@ export const Drill = ({
         type='button'
         aria-label='Previous'
         onClick={() => dispatchState({ type: 'PREV', length: drillData.length })}
+        disabled={state.drillItemIndex === 0}
       >
         <svg width='24' height='24' viewBox='0 0 24 24' style={{ verticalAlign: 'middle' }} aria-hidden='true'>
           <title>previous</title>
@@ -158,7 +159,12 @@ export const Drill = ({
           />
         </svg>
       </button>
-      <button type='button' aria-label='Next' onClick={() => dispatchState({ type: 'NEXT', length: drillData.length })}>
+      <button
+        type='button'
+        aria-label='Next'
+        onClick={() => dispatchState({ type: 'NEXT', length: drillData.length })}
+        disabled={state.isCompleted}
+      >
         <svg width='24' height='24' viewBox='0 0 24 24' style={{ verticalAlign: 'middle' }} aria-hidden='true'>
           <title>next</title>
           <path
