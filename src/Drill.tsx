@@ -78,7 +78,7 @@ const reduceDrillStateImpl = (state: DrillState, action: Action): DrillState => 
     }
 
     default: {
-      console.log(`error: ${action}`);
+      console.error(`error: ${action}`);
       return state;
     }
   }

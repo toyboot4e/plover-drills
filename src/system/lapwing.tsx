@@ -15,7 +15,7 @@ const matchWord = (expected: string, userInput: string): boolean => {
     return prefixes.some((p) => p === userInput);
   } else {
     // needs regeneration of `drills-gen.json`
-    console.log(`error: non-registerd word '${expected}' was looked up`);
+    console.error(`error: non-registerd word '${expected}' was looked up`);
     return false;
   }
 };

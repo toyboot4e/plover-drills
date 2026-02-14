@@ -87,7 +87,6 @@ const AppImpl = ({
     (s) => (s === null ? Math.random() : Number(s)),
     String,
   );
-  console.log(`seed: ${shuffleSeed}`);
 
   const [alwaysShowKeyboard, setAlwaysShowKeyboard] = useLocalStorage<boolean>(
     localStorageKey(systemName, 'always-show-keyboard'),
