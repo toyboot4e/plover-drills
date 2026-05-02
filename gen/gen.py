@@ -73,7 +73,7 @@ def main():
     system.setup(system_name)
     dict = load_dict(config, system_name)
 
-    root = Path("../drills")
+    root = Path("../drills/Lapwing")
     word_to_outlines = defaultdict(set)
     for path in root.glob("*.txt"):
         logger.info(f'collecting words in {path}')
@@ -94,8 +94,9 @@ def main():
             #     word_to_strokes[word] = list(strokes)
             for i in range(1, len(outline) + 1):  
                 prefix = outline[:i]  
-                translation = dict.lookup(prefix)  
-                translations.add(translation)
+                translation = dict.lookup(prefix)
+                if translation is not None:
+                    translations.add(translation)
         word_to_strokes[word] = list(translations)
     print(json.dumps(word_to_strokes))
 
