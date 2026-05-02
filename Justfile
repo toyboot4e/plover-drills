@@ -31,3 +31,7 @@ check:
 
 [private]
 alias c := check
+
+# updates dependencies aggressively
+update:
+    npx npm-check-updates -u && npm install

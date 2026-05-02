@@ -15,22 +15,22 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@base-ui/react": "^1.1.0",
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "@base-ui/react": "^1.4.1",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.3.11",
-    "@types/node": "^24.10.1",
-    "@types/react": "^19.2.5",
+    "@biomejs/biome": "^2.4.14",
+    "@types/node": "^25.6.0",
+    "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react-swc": "^4.2.2",
-    "globals": "^16.5.0",
-    "sass-embedded": "^1.97.2",
-    "typescript": "~5.9.3",
-    "vite": "npm:rolldown-vite@7.2.5"
+    "@vitejs/plugin-react-swc": "^4.3.0",
+    "globals": "^17.6.0",
+    "sass-embedded": "^1.99.0",
+    "typescript": "~6.0.3",
+    "vite": "npm:rolldown-vite@7.3.1"
   },
   "overrides": {
-    "vite": "npm:rolldown-vite@7.2.5"
+    "vite": "npm:rolldown-vite@7.3.1"
   }
 }
