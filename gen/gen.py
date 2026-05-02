@@ -78,7 +78,8 @@ def process_monkey(dict):
         for line in f:
             columns = line.rstrip("\n").split("\t")
             word = columns[0]
-            expected = next(iter(dict.reverse_lookup(word)))[0]
+            expected_stroke = next(iter(dict.reverse_lookup(word)))
+            expected = '/'.join(expected_stroke)
             lines.append(f'{word}\t{expected}')
 
     dst = Path("../drills/Lapwing/monkeytype-english-200.txt")
