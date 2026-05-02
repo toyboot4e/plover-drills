@@ -78,7 +78,8 @@ def process_monkey(dict):
         for line in f:
             columns = line.rstrip("\n").split("\t")
             word = columns[0]
-            expected_stroke = next(iter(dict.reverse_lookup(word)))
+            # select one of the shortest strokes
+            expected_stroke = min(dict.reverse_lookup(word), key=len)
             expected = '/'.join(expected_stroke)
             lines.append(f'{word}\t{expected}')
 
