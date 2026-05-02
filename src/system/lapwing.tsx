@@ -1,6 +1,6 @@
 // word -> translations of prefixes of outlines
 
-import wordMapData from '../../public/drills-gen/Lapwing.json' with { type: 'json' };
+import wordMapData from '../generated/Lapwing.json' with { type: 'json' };
 import type { DrillData } from '../Drill';
 import * as uni from '../stroke/uniV4';
 import type { System } from '../system';

@@ -67,11 +67,32 @@ def load_dict(config: Config, system_name: str) -> StenoDictionaryCollection:
     return StenoDictionaryCollection(dicts)
 
 
+# https://github.com/monkeytypegame/monkeytype/blob/36784956d3606fcd6cf8a757402e70a6832030c5/frontend/static/languages/english.json
+def process_monkey(dict):
+    """Processes Monkeytype 200 English words entry"""
+    src = Path("./monkeytype-english-200.txt")
+    logger.info(f'processing {src}')
+
+    lines = []
+    with src.open("r", encoding="utf-8") as f:
+        for line in f:
+            columns = line.rstrip("\n").split("\t")
+            word = columns[0]
+            expected = next(iter(dict.reverse_lookup(word)))[0]
+            lines.append(f'{word}\t{expected}')
+
+    dst = Path("../drills/Lapwing/monkeytype-english-200.txt")
+    logger.info(f'wrinting to {dst}')
+    dst.write_text('\n'.join(lines))
+
+
 # Collect word -> translations of prefixes of outlines
 def main():
     config, system_name = load_default()
     system.setup(system_name)
     dict = load_dict(config, system_name)
+
+    process_monkey(dict)
 
     root = Path("../drills/Lapwing")
     word_to_outlines = defaultdict(set)

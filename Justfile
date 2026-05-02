@@ -16,10 +16,13 @@ download:
 [private]
 alias dl := download
 
-# generates `drills-gen.json`
+# generates `src/generated`
 generate-drills-json:
     # be sure that direnv is loaded in gen/
-    cd gen && uv run gen.py > ../public/drills-gen/Lapwing.json
+    cd gen && uv run gen.py > ../src/generated/Lapwing.json
+
+[private]
+alias gen := generate-drills-json
 
 # runs the app on dev srever at localhost:5173
 dev:
