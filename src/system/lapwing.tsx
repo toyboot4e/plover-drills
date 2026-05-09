@@ -1,12 +1,21 @@
 // word -> translations of prefixes of outlines
 
-import wordMapData from '../generated/Lapwing.json' with { type: 'json' };
 import type { System } from '../system';
 import { type DrillFile, generateDrills } from './utils';
 
-const generatedWordMap = wordMapData as Record<string, Array<string>>;
+let generatedWordMap: Record<string, Array<string>> | null = null;
+
+const loadWordMap = async (): Promise<void> => {
+  if (generatedWordMap) return;
+  const data = await import('../generated/Lapwing.json');
+  generatedWordMap = data.default as Record<string, Array<string>>;
+};
 
 const matchWord = (expected: string, userInput: string): boolean => {
+  if (!generatedWordMap) {
+    console.error('error: word map not loaded yet');
+    return false;
+  }
   const prefixes = generatedWordMap[expected];
   if (typeof prefixes !== 'undefined') {
     // TODO: Is this deep comparison?
@@ -22,6 +31,7 @@ const drillFiles: DrillFile[] = generateDrills(
   import.meta.glob('../../drills/Lapwing/*.txt', {
     query: '?raw',
   }) as Record<string, () => Promise<{ default: string }>>,
+  loadWordMap,
 );
 
 const Footer = (props: React.HTMLAttributes<HTMLElement>): React.JSX.Element => {

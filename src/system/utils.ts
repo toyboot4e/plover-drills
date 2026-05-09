@@ -14,13 +14,16 @@ const parseDrillData = (text: string): DrillData =>
       };
     });
 
-export const generateDrills = (data: Record<string, () => Promise<{ default: string }>>): Array<DrillFile> => {
+export const generateDrills = (
+  data: Record<string, () => Promise<{ default: string }>>,
+  onLoad: () => Promise<void>,
+): Array<DrillFile> => {
   return Object.entries(data)
     .map(([path, load]) => ({
       // biome-ignore lint/style/noNonNullAssertion: ignore
       name: path.split('/').pop()!,
       loadDrillData: async () => {
-        const text = await load();
+        const [text] = await Promise.all([load(), onLoad()]);
         return parseDrillData(text.default);
       },
     }))

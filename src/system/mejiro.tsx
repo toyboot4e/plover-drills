@@ -11,6 +11,7 @@ const drillFiles: DrillFile[] = generateDrills(
   import.meta.glob('../../drills/Mejiro/*.txt', {
     query: '?raw',
   }) as Record<string, () => Promise<{ default: string }>>,
+  () => Promise.resolve(),
 );
 
 const Footer = (props: React.HTMLAttributes<HTMLElement>): React.JSX.Element => {
