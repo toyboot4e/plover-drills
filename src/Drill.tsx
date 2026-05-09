@@ -102,6 +102,7 @@ export type DrillProps = {
   matchWord: MatchWord;
   OutlineHint: (props: OutlineHintProps) => React.JSX.Element;
   AccentHint: (props: AccentHintProps) => React.JSX.Element | null;
+  showAccentHint: boolean;
 };
 
 export const Drill = ({
@@ -112,6 +113,7 @@ export const Drill = ({
   matchWord,
   OutlineHint,
   AccentHint,
+  showAccentHint,
 }: DrillProps): React.JSX.Element => {
   const inits = useLocalStorage<number>(drillItemIndexKey, Number, String);
   const [state, dispatchState] = useReducer(reduceDrillState, inits, ([drillItemIndex, setDrillItemIndex]) => {
@@ -185,7 +187,7 @@ export const Drill = ({
       <>
         <p className={styles.lessonStatus}>
           [{state.drillItemIndex + 1} / {drillData.length}] {expected}
-          <AccentHint show={state.fail} word={expected} />
+          {showAccentHint && <AccentHint show={state.fail} word={expected} />}
           {nextPrev}
         </p>
         {/* biome-ignore lint/a11y/noAutofocus: ignore */}

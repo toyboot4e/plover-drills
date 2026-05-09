@@ -18,6 +18,7 @@ const DrillLoader = ({
   shuffleSeed,
   drillItemIndexKey,
   alwaysShowKeyboard,
+  showAccentHint,
   system,
   keyboard,
 }: {
@@ -27,6 +28,7 @@ const DrillLoader = ({
   shuffleSeed: number;
   drillItemIndexKey: string;
   alwaysShowKeyboard: boolean;
+  showAccentHint: boolean;
   system: System;
   keyboard: Keyboard;
 }): React.JSX.Element => {
@@ -40,6 +42,7 @@ const DrillLoader = ({
       matchWord={system.matchWord}
       OutlineHint={keyboard.OutlineHint}
       AccentHint={keyboard.AccentHint}
+      showAccentHint={showAccentHint}
       key={drillFile.name}
     />
   );
@@ -93,6 +96,13 @@ const AppImpl = ({
     String,
   );
   const [defaultAlwaysShowKeyboard] = useState(() => alwaysShowKeyboard);
+
+  const [showAccentHint, setShowAccentHint] = useLocalStorage<boolean>(
+    localStorageKey(systemName, 'show-accent-hint'),
+    (v) => v === null || v === 'true',
+    String,
+  );
+  const [defaultShowAccentHint] = useState(() => showAccentHint);
 
   const [filename, setFilename] = useLocalStorage<string | null>(localStorageKey(systemName, 'drill-name'), id, id);
 
@@ -206,6 +216,14 @@ const AppImpl = ({
                 setAlwaysShowKeyboard(alwaysShowKeyboard);
               }}
             />
+            <MyCheckbox
+              title='Accent hint'
+              checked={showAccentHint}
+              defaultChecked={defaultShowAccentHint}
+              onCheckedChange={(showAccentHint, _) => {
+                setShowAccentHint(showAccentHint);
+              }}
+            />
           </div>
         </fieldset>
         {deferredDrillDataPromise && drillFile && (
@@ -217,6 +235,7 @@ const AppImpl = ({
               shuffleSeed={shuffleSeed}
               drillItemIndexKey={drillItemIndexKey}
               alwaysShowKeyboard={alwaysShowKeyboard}
+              showAccentHint={showAccentHint}
               system={system}
               keyboard={keyboard}
             />
