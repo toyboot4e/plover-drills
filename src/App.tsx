@@ -1,5 +1,5 @@
 import type { Combobox } from '@base-ui/react/combobox';
-import { Suspense, use, useMemo, useState } from 'react';
+import { Suspense, use, useDeferredValue, useMemo, useState } from 'react';
 import styles from './App.module.scss';
 import { getKeyboard } from './keyboard';
 import type { Keyboard, KeyboardName } from './keyboard/types';
@@ -141,6 +141,7 @@ const AppImpl = ({
   const drillItemIndexKey = localStorageKey(systemName, 'drill-item-index');
 
   const drillDataPromise = useMemo(() => drillFile?.loadDrillData() ?? null, [drillFile]);
+  const deferredDrillDataPromise = useDeferredValue(drillDataPromise);
 
   const onChangeDrill = (drillItem: MyComboboxItem | null, _: Combobox.Root.ChangeEventDetails) => {
     setFilename(drillItem?.key ?? null);
@@ -207,10 +208,10 @@ const AppImpl = ({
             />
           </div>
         </fieldset>
-        {drillDataPromise && drillFile && (
+        {deferredDrillDataPromise && drillFile && (
           <Suspense>
             <DrillLoader
-              drillDataPromise={drillDataPromise}
+              drillDataPromise={deferredDrillDataPromise}
               drillFile={drillFile}
               shuffle={shuffle}
               shuffleSeed={shuffleSeed}
