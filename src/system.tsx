@@ -1,5 +1,5 @@
-import type { KeyboardName } from './keyboard';
 import type { DrillData, MatchWord } from './Drill';
+import type { KeyboardName } from './keyboard/types';
 import { lapwingSystem } from './system/lapwing';
 import { mejiroSystem } from './system/mejiro';
 

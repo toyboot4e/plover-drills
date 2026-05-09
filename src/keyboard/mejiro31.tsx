@@ -1,5 +1,5 @@
-import type { AccentHintProps, OutlineHintProps, StrokeProps } from '../keyboard';
 import style from './style.module.scss';
+import type { AccentHintProps, OutlineHintProps, StrokeProps } from './types';
 
 const chars: Array<Array<string>> = [
   ['#', 'S', 'T', 'Y', 'I', 'U', '', 'U', 'I', 'Y', 'T', 'S', '*'],

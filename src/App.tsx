@@ -1,7 +1,8 @@
 import type { Combobox } from '@base-ui/react/combobox';
-import { type AccentHintProps, getKeyboard, type KeyboardName, type OutlineHintProps } from './keyboard';
 import { useMemo, useState } from 'react';
 import styles from './App.module.scss';
+import { getKeyboard } from './keyboard';
+import type { AccentHintProps, KeyboardName, OutlineHintProps } from './keyboard/types';
 import { MyCheckbox } from './MyCheckbox.tsx';
 import { MyCombobox, type MyComboboxItem } from './MyCombobox.tsx';
 import './theme.css';
