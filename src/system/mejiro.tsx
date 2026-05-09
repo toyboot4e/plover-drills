@@ -1,7 +1,6 @@
 // word -> translations of prefixes of outlines
 
 import type { DrillData } from '../Drill';
-import * as mejiro31 from '../stroke/mejiro31';
 import type { System } from '../system';
 import { generateDrills } from './utils';
 
@@ -30,10 +29,7 @@ const Footer = (props: React.HTMLAttributes<HTMLElement>): React.JSX.Element => 
 
 export const mejiroSystem: System = {
   matchWord,
-  drillFiles,
   keyboards: ['Mejiro31'],
+  drillFiles,
   Footer,
-  Stroke: mejiro31.Stroke,
-  OutlineHint: mejiro31.OutlineHint,
-  AccentHint: mejiro31.AccentHint,
 };

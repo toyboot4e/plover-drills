@@ -15,6 +15,7 @@ export type MyComboboxProps<T extends MyComboboxItem> = {
   width: string;
   defaultValue: T | null;
   onValueChange?: (value: T | null, eventDetails: Combobox.Root.ChangeEventDetails) => void;
+  allowClear?: boolean;
 };
 
 /**
@@ -27,6 +28,7 @@ export const MyCombobox = <T extends MyComboboxItem>({
   width,
   defaultValue,
   onValueChange,
+  allowClear,
 }: MyComboboxProps<T>): React.JSX.Element => {
   const id = React.useId();
   return (
@@ -35,9 +37,11 @@ export const MyCombobox = <T extends MyComboboxItem>({
         <div className={styles.InputWrapper}>
           <Combobox.Input placeholder={placeholder} id={id} className={styles.Input} style={{ width }} />
           <div className={styles.ActionButtons}>
-            <Combobox.Clear className={styles.Clear} aria-label='Clear selection'>
-              <ClearIcon className={styles.ClearIcon} />
-            </Combobox.Clear>
+            {(allowClear === undefined || allowClear) && (
+              <Combobox.Clear className={styles.Clear} aria-label='Clear selection'>
+                <ClearIcon className={styles.ClearIcon} />
+              </Combobox.Clear>
+            )}
             <Combobox.Trigger className={styles.Trigger} aria-label='Open popup'>
               <ChevronDownIcon className={styles.TriggerIcon} />
             </Combobox.Trigger>

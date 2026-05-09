@@ -1,7 +1,6 @@
 import type { AccentHintProps, OutlineHintProps, StrokeProps } from '../stroke';
 import style from './style.module.scss';
 
-// Uni V4
 const chars: Array<Array<string>> = [
   ['#', 'S', 'T', 'Y', 'I', 'U', '', 'U', 'I', 'Y', 'T', 'S', '*'],
   ['', '', 'K', 'N', 'A', 'U', '', 'U', 'A', 'N', 'K', '', ''],
@@ -65,7 +64,7 @@ const collectKeyPress = (chars: Array<Array<string>>, stroke: string): Array<Arr
   return ret;
 };
 
-export const Stroke = ({ stroke }: StrokeProps): React.JSX.Element => {
+const Stroke = ({ stroke }: StrokeProps): React.JSX.Element => {
   const isPressed = collectKeyPress(chars, stroke);
   const keys = chars.flatMap((cs, row) => {
     return cs.map((c, col) => {
@@ -86,7 +85,7 @@ export const Stroke = ({ stroke }: StrokeProps): React.JSX.Element => {
   return <div className={style.stenoVizStroke}>{keys}</div>;
 };
 
-export const OutlineHint = ({ outline }: OutlineHintProps): React.JSX.Element => {
+const OutlineHint = ({ outline }: OutlineHintProps): React.JSX.Element => {
   return (
     <div className={style.stenoViz}>
       {outline.map((stroke, i) => (
@@ -97,6 +96,12 @@ export const OutlineHint = ({ outline }: OutlineHintProps): React.JSX.Element =>
   );
 };
 
-export const AccentHint = (_: AccentHintProps): React.JSX.Element | null => {
+const AccentHint = (_: AccentHintProps): React.JSX.Element | null => {
   return null;
+};
+
+export const keyboard = {
+  Stroke,
+  OutlineHint,
+  AccentHint,
 };

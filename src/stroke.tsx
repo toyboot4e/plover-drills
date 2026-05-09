@@ -1,3 +1,23 @@
+import * as mejiro31 from './stroke/mejiro31';
+import * as uniV4 from './stroke/uniV4';
+
+export type KeyboardName = 'UniV4' | 'Mejiro31';
+
+export type Keyboard = {
+  Stroke: (props: StrokeProps) => React.JSX.Element;
+  OutlineHint: (props: OutlineHintProps) => React.JSX.Element;
+  AccentHint: (props: AccentHintProps) => React.JSX.Element | null;
+};
+
+export const getKeyboard = (kbd: KeyboardName): Keyboard => {
+  switch (kbd) {
+    case 'UniV4':
+      return uniV4.keyboard;
+    case 'Mejiro31':
+      return mejiro31.keyboard;
+  }
+};
+
 export type StrokeProps = {
   stroke: string;
 };

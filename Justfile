@@ -28,6 +28,13 @@ alias gen := generate-drills-json
 dev:
     npm run dev "$@"
 
+# runs npm run build
+build:
+    npm run build
+
+[private]
+alias b := build
+
 # runs biome check --fix
 check:
     npm run check:fix

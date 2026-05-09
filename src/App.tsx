@@ -3,7 +3,8 @@ import { useMemo, useState } from 'react';
 import styles from './App.module.scss';
 import { MyCheckbox } from './MyCheckbox.tsx';
 import { MyCombobox, type MyComboboxItem } from './MyCombobox.tsx';
-import type { AccentHintProps, OutlineHintProps } from './stroke';
+import type { AccentHintProps, KeyboardName, OutlineHintProps } from './stroke';
+import { getKeyboard } from './stroke';
 import './theme.css';
 import { createDrillDataIndex, Drill, type DrillData, type DrillProps, type MatchWord } from './Drill';
 import { getSystem, type System, type SystemName, systemNames } from './system';
@@ -108,6 +109,22 @@ const AppImpl = ({
   };
 
   const system: System = getSystem(systemName);
+
+  const [keyboardName, setKeyboardName] = useLocalStorage<KeyboardName>(
+    localStorageKey(systemName, 'keyboard'),
+    (kbd) => (kbd && system.keyboards.find((k) => k === kbd)) || system.keyboards[0],
+    id,
+  );
+  const keyboard = useMemo(() => getKeyboard(keyboardName), [keyboardName]);
+
+  const keyboardItems = useMemo(() => {
+    return system.keyboards.map((kbd) => ({
+      key: kbd,
+      label: kbd,
+    }));
+  }, [system]);
+  const [defaultKeyboard] = useState(() => keyboardItems.find(({ key }) => key === keyboardName) || keyboardItems[0]);
+
   const comboboxDrillItems = useMemo(() => {
     return createComboboxDrillItems(system.drillFiles);
   }, [system]);
@@ -131,8 +148,8 @@ const AppImpl = ({
             drillItemIndexKey,
             alwaysShowKeyboard,
             system.matchWord,
-            system.OutlineHint,
-            system.AccentHint,
+            keyboard.OutlineHint,
+            keyboard.AccentHint,
           )
         : null,
     [drill, shuffle, shuffleSeed, drill, drillItemIndexKey, alwaysShowKeyboard, system],
@@ -148,20 +165,6 @@ const AppImpl = ({
     localStorage.removeItem(drillItemIndexKey);
   };
 
-  const [keyboard, _setKeyboard] = useLocalStorage<string>(
-    localStorageKey(systemName, 'keyboard'),
-    (kbd) => (kbd && system.keyboards.find((k) => k === kbd)) || system.keyboards[0],
-    id,
-  );
-
-  const keyboardItems = useMemo(() => {
-    return system.keyboards.map((kbd) => ({
-      key: kbd,
-      label: kbd,
-    }));
-  }, [system]);
-  const [defaultKeyboard] = useState(() => keyboardItems.find(({ key }) => key === keyboard) || keyboardItems[0]);
-
   return (
     <>
       <h1 className={styles.header}>Plove Drills</h1>
@@ -173,6 +176,7 @@ const AppImpl = ({
           defaultValue={defaultSystemItem}
           placeholder={'System'}
           onValueChange={onSystemChange}
+          allowClear={false}
         />
         <p className={styles.checkboxContainer} style={{ display: 'flex' }}>
           Choose your keyboard
@@ -182,7 +186,13 @@ const AppImpl = ({
           placeholder='Keyboard'
           width='100%'
           defaultValue={defaultKeyboard}
-          onValueChange={(_) => {}}
+          onValueChange={(item) => {
+            // TODO: forbid null
+            if (item !== null) {
+              setKeyboardName(item.key);
+            }
+          }}
+          allowClear={false}
         />
         <p className={styles.checkboxContainer} style={{ display: 'flex' }}>
           Choose your drill
@@ -210,6 +220,7 @@ const AppImpl = ({
           width='100%'
           defaultValue={defaultDrill}
           onValueChange={onChangeDrill}
+          allowClear={false}
         />
         {drillProps && <Drill {...drillProps.drillProps} key={drillProps.fileName} />}
       </main>

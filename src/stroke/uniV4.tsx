@@ -2,7 +2,6 @@ import { Suspense, use, useMemo } from 'react';
 import type { AccentHintProps, OutlineHintProps, StrokeProps } from '../stroke';
 import style from './style.module.scss';
 
-// Uni V4
 const chars: Array<Array<string>> = [
   ['#', 'T', 'P', 'H', '*', '', '*', 'F', 'P', 'L', 'T', 'D'],
   ['S', 'K', 'W', 'R', '', '', '', 'R', 'B', 'G', 'S', 'Z'],
@@ -84,7 +83,7 @@ const collectKeyPress = (chars: Array<Array<string>>, stroke: string): Array<Arr
   return ret;
 };
 
-export const Stroke = ({ stroke }: StrokeProps): React.JSX.Element => {
+const Stroke = ({ stroke }: StrokeProps): React.JSX.Element => {
   const isPressed = collectKeyPress(chars, stroke);
   const keys = chars.flatMap((cs, row) => {
     return cs.map((c, col) => {
@@ -104,7 +103,7 @@ export const Stroke = ({ stroke }: StrokeProps): React.JSX.Element => {
   return <div className={style.stenoVizStroke}>{keys}</div>;
 };
 
-export const OutlineHint = ({ outline }: OutlineHintProps): React.JSX.Element => {
+const OutlineHint = ({ outline }: OutlineHintProps): React.JSX.Element => {
   return (
     <div className={style.stenoViz}>
       {outline.map((stroke, i) => (
@@ -141,7 +140,7 @@ const AccentHintInner = ({ resource }: { resource: Promise<string | null> }): Re
   );
 };
 
-export const AccentHint = ({ show, word }: AccentHintProps): React.JSX.Element | null => {
+const AccentHint = ({ show, word }: AccentHintProps): React.JSX.Element | null => {
   // important, otherwise loading forever
   const resource = useMemo(() => fetchAccent(word), [word]);
   if (!show) return null;
@@ -150,4 +149,10 @@ export const AccentHint = ({ show, word }: AccentHintProps): React.JSX.Element |
       <AccentHintInner resource={resource} />
     </Suspense>
   );
+};
+
+export const keyboard = {
+  Stroke,
+  OutlineHint,
+  AccentHint,
 };
