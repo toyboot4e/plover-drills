@@ -169,59 +169,60 @@ const AppImpl = ({
     <>
       <h1 className={styles.header}>Plove Drills</h1>
       <main className={styles.main}>
-        <p>Choose your system</p>
-        <MyCombobox
-          items={systemItems}
-          width='100%'
-          defaultValue={defaultSystemItem}
-          placeholder={'System'}
-          onValueChange={onSystemChange}
-          allowClear={false}
-        />
-        <p className={styles.checkboxContainer} style={{ display: 'flex' }}>
-          Choose your keyboard
-        </p>
-        <MyCombobox
-          items={keyboardItems}
-          placeholder='Keyboard'
-          width='100%'
-          defaultValue={defaultKeyboard}
-          onValueChange={(item) => {
-            // TODO: forbid null
-            if (item !== null) {
-              setKeyboardName(item.key);
-            }
-          }}
-          allowClear={false}
-        />
-        <p className={styles.checkboxContainer} style={{ display: 'flex' }}>
-          Choose your drill
-          <MyCheckbox
-            title='Shuffle'
-            checked={shuffle}
-            defaultChecked={defaultShuffle}
-            onCheckedChange={(shuffle, _) => {
-              setShuffle(shuffle);
-            }}
+        <fieldset className={styles.settingsGrid}>
+          <span className={styles.settingsLabel}>System</span>
+          <MyCombobox
+            items={systemItems}
+            width='100%'
+            defaultValue={defaultSystemItem}
+            placeholder={'System'}
+            onValueChange={onSystemChange}
+            allowClear={false}
           />
-          <MyCheckbox
-            title='Always show keyboard'
-            checked={alwaysShowKeyboard}
-            defaultChecked={defaultAlwaysShowKeyboard}
-            onCheckedChange={(alwaysShowKeyboard, _) => {
-              setAlwaysShowKeyboard(alwaysShowKeyboard);
+          <span className={styles.settingsLabel}>Keyboard</span>
+          <MyCombobox
+            items={keyboardItems}
+            placeholder='Keyboard'
+            width='100%'
+            defaultValue={defaultKeyboard}
+            onValueChange={(item) => {
+              // TODO: forbid null
+              if (item !== null) {
+                setKeyboardName(item.key);
+              }
             }}
+            allowClear={false}
           />
-        </p>
-        <MyCombobox
-          items={comboboxDrillItems}
-          placeholder='Drill'
-          emptyString='No drill found'
-          width='100%'
-          defaultValue={defaultDrill}
-          onValueChange={onChangeDrill}
-          allowClear={false}
-        />
+          <span className={styles.settingsLabel}>Drill</span>
+          <MyCombobox
+            items={comboboxDrillItems}
+            placeholder='Drill'
+            emptyString='No drill found'
+            width='100%'
+            defaultValue={defaultDrill}
+            onValueChange={onChangeDrill}
+            allowClear={false}
+          />
+          <div />
+          <div className={styles.checkboxRow}>
+            <MyCheckbox
+              title='Shuffle'
+              checked={shuffle}
+              defaultChecked={defaultShuffle}
+              onCheckedChange={(shuffle, _) => {
+                setShuffle(shuffle);
+              }}
+            />
+            <MyCheckbox
+              title='Always show keyboard'
+              checked={alwaysShowKeyboard}
+              defaultChecked={defaultAlwaysShowKeyboard}
+              onCheckedChange={(alwaysShowKeyboard, _) => {
+                setAlwaysShowKeyboard(alwaysShowKeyboard);
+              }}
+            />
+          </div>
+        </fieldset>
         {drillProps && <Drill {...drillProps.drillProps} key={drillProps.fileName} />}
       </main>
       <system.Footer className={styles.footer} />
