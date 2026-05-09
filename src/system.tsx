@@ -13,7 +13,7 @@ export const systemNames: Array<SystemName> = ['lapwing', 'mejiro'];
 export type System = {
   matchWord: MatchWord;
   keyboards: KeyboardName[];
-  drillFiles: Array<{ name: string; drillData: DrillData }>;
+  drillFiles: Array<{ name: string; loadDrillData: () => Promise<DrillData> }>;
   Footer: (props: React.HTMLAttributes<HTMLElement>) => React.JSX.Element;
 };
 

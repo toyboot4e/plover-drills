@@ -1,21 +1,17 @@
 // word -> translations of prefixes of outlines
 
-import type { DrillData } from '../Drill';
 import type { System } from '../system';
-import { generateDrills } from './utils';
+import { type DrillFile, generateDrills } from './utils';
 
 const matchWord = (expected: string, userInput: string): boolean => {
   return expected.substring(0, userInput.length) === userInput;
 };
 
-const drillFiles: Array<{ name: string; drillData: DrillData }> = (() => {
-  const rawDrillFiles = import.meta.glob('../../drills/Mejiro/*.txt', {
+const drillFiles: DrillFile[] = generateDrills(
+  import.meta.glob('../../drills/Mejiro/*.txt', {
     query: '?raw',
-    eager: true,
-  }) as Record<string, { default: string }>;
-
-  return generateDrills(rawDrillFiles);
-})();
+  }) as Record<string, () => Promise<{ default: string }>>,
+);
 
 const Footer = (props: React.HTMLAttributes<HTMLElement>): React.JSX.Element => {
   return (

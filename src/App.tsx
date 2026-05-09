@@ -1,50 +1,48 @@
 import type { Combobox } from '@base-ui/react/combobox';
-import { useMemo, useState } from 'react';
+import { Suspense, use, useMemo, useState } from 'react';
 import styles from './App.module.scss';
 import { getKeyboard } from './keyboard';
-import type { AccentHintProps, KeyboardName, OutlineHintProps } from './keyboard/types';
+import type { Keyboard, KeyboardName } from './keyboard/types';
 import { MyCheckbox } from './MyCheckbox.tsx';
 import { MyCombobox, type MyComboboxItem } from './MyCombobox.tsx';
 import './theme.css';
-import { createDrillDataIndex, Drill, type DrillData, type DrillProps, type MatchWord } from './Drill';
+import { createDrillDataIndex, Drill, type DrillData } from './Drill';
 import { getSystem, type System, type SystemName, systemNames } from './system';
+import type { DrillFile } from './system/utils.ts';
 import { id, useLocalStorage } from './utils.ts';
 
-type MyComboboxDrillItem = MyComboboxItem & { drillData: DrillData };
-
-const createComboboxDrillItems = (
-  drillFiles: Array<{ name: string; drillData: DrillData }>,
-): Array<MyComboboxDrillItem> =>
-  drillFiles.map(({ name, drillData }) => {
-    return {
-      key: name,
-      label: name,
-      drillData,
-    };
-  });
-
-const createDrillProps = (
-  shuffle: boolean,
-  shuffleSeed: number,
-  drillItem: MyComboboxDrillItem,
-  drillItemIndexKey: string,
-  alwaysShowKeyboard: boolean,
-  matchWord: MatchWord,
-  OutlineHint: (props: OutlineHintProps) => React.JSX.Element,
-  AccentHint: (props: AccentHintProps) => React.JSX.Element | null,
-): { drillProps: DrillProps; fileName: string } => {
-  return {
-    drillProps: {
-      drillData: drillItem.drillData,
-      drillDataIndex: createDrillDataIndex(drillItem.drillData.length, shuffle, shuffleSeed),
-      drillItemIndexKey,
-      alwaysShowKeyboard,
-      matchWord,
-      OutlineHint,
-      AccentHint,
-    },
-    fileName: drillItem.key,
-  };
+const DrillLoader = ({
+  drillDataPromise,
+  drillFile,
+  shuffle,
+  shuffleSeed,
+  drillItemIndexKey,
+  alwaysShowKeyboard,
+  system,
+  keyboard,
+}: {
+  drillDataPromise: Promise<DrillData>;
+  drillFile: DrillFile;
+  shuffle: boolean;
+  shuffleSeed: number;
+  drillItemIndexKey: string;
+  alwaysShowKeyboard: boolean;
+  system: System;
+  keyboard: Keyboard;
+}): React.JSX.Element => {
+  const drillData = use(drillDataPromise);
+  return (
+    <Drill
+      drillData={drillData}
+      drillDataIndex={createDrillDataIndex(drillData.length, shuffle, shuffleSeed)}
+      drillItemIndexKey={drillItemIndexKey}
+      alwaysShowKeyboard={alwaysShowKeyboard}
+      matchWord={system.matchWord}
+      OutlineHint={keyboard.OutlineHint}
+      AccentHint={keyboard.AccentHint}
+      key={drillFile.name}
+    />
+  );
 };
 
 const defaultSystemName: SystemName = 'lapwing';
@@ -126,39 +124,25 @@ const AppImpl = ({
   const [defaultKeyboard] = useState(() => keyboardItems.find(({ key }) => key === keyboardName) || keyboardItems[0]);
 
   const comboboxDrillItems = useMemo(() => {
-    return createComboboxDrillItems(system.drillFiles);
+    return system.drillFiles.map(({ name }) => ({ key: name, label: name }));
   }, [system]);
 
-  const drill = useMemo<MyComboboxDrillItem | null>(
-    () => (typeof filename === 'string' ? comboboxDrillItems.find((d) => d.key === filename) || null : null),
-    [comboboxDrillItems, filename],
+  const drillFile = useMemo<DrillFile | null>(
+    () => (typeof filename === 'string' ? system.drillFiles.find((d) => d.name === filename) || null : null),
+    [system, filename],
   );
-  const [defaultDrill] = useState(() => drill);
+
+  const defaultDrillItem = useMemo(
+    () => (drillFile ? comboboxDrillItems.find((d) => d.key === drillFile.name) || null : null),
+    [comboboxDrillItems, drillFile],
+  );
+  const [defaultDrill] = useState(() => defaultDrillItem);
 
   const drillItemIndexKey = localStorageKey(systemName, 'drill-item-index');
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: do not shuffle on toggle
-  const drillProps = useMemo<{ drillProps: DrillProps; fileName: string } | null>(
-    () =>
-      drill
-        ? createDrillProps(
-            shuffle,
-            shuffleSeed,
-            drill,
-            drillItemIndexKey,
-            alwaysShowKeyboard,
-            system.matchWord,
-            keyboard.OutlineHint,
-            keyboard.AccentHint,
-          )
-        : null,
-    [drill, shuffle, shuffleSeed, drill, drillItemIndexKey, alwaysShowKeyboard, system],
-  );
+  const drillDataPromise = useMemo(() => drillFile?.loadDrillData() ?? null, [drillFile]);
 
-  const onChangeDrill = (
-    drillItem: (MyComboboxItem & { drillData: DrillData }) | null,
-    _: Combobox.Root.ChangeEventDetails,
-  ) => {
+  const onChangeDrill = (drillItem: MyComboboxItem | null, _: Combobox.Root.ChangeEventDetails) => {
     setFilename(drillItem?.key ?? null);
     setShuffleSeed(Math.random());
     // Discard the item index state. TODO: This is too hacky.
@@ -223,7 +207,20 @@ const AppImpl = ({
             />
           </div>
         </fieldset>
-        {drillProps && <Drill {...drillProps.drillProps} key={drillProps.fileName} />}
+        {drillDataPromise && drillFile && (
+          <Suspense>
+            <DrillLoader
+              drillDataPromise={drillDataPromise}
+              drillFile={drillFile}
+              shuffle={shuffle}
+              shuffleSeed={shuffleSeed}
+              drillItemIndexKey={drillItemIndexKey}
+              alwaysShowKeyboard={alwaysShowKeyboard}
+              system={system}
+              keyboard={keyboard}
+            />
+          </Suspense>
+        )}
       </main>
       <system.Footer className={styles.footer} />
     </>

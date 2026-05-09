@@ -1,9 +1,8 @@
 // word -> translations of prefixes of outlines
 
-import type { DrillData } from '../Drill';
 import wordMapData from '../generated/Lapwing.json' with { type: 'json' };
 import type { System } from '../system';
-import { generateDrills } from './utils';
+import { type DrillFile, generateDrills } from './utils';
 
 const generatedWordMap = wordMapData as Record<string, Array<string>>;
 
@@ -19,14 +18,11 @@ const matchWord = (expected: string, userInput: string): boolean => {
   }
 };
 
-const drillFiles: Array<{ name: string; drillData: DrillData }> = (() => {
-  const rawDrillFiles = import.meta.glob('../../drills/Lapwing/*.txt', {
+const drillFiles: DrillFile[] = generateDrills(
+  import.meta.glob('../../drills/Lapwing/*.txt', {
     query: '?raw',
-    eager: true,
-  }) as Record<string, { default: string }>;
-
-  return generateDrills(rawDrillFiles);
-})();
+  }) as Record<string, () => Promise<{ default: string }>>,
+);
 
 const Footer = (props: React.HTMLAttributes<HTMLElement>): React.JSX.Element => {
   return (
