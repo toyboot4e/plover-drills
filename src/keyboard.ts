@@ -1,5 +1,5 @@
-import * as mejiro31 from './stroke/mejiro31';
-import * as uniV4 from './stroke/uniV4';
+import * as mejiro31 from './keyboard/mejiro31';
+import * as uniV4 from './keyboard/uniV4';
 
 export type KeyboardName = 'UniV4' | 'Mejiro31';
 

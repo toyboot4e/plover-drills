@@ -1,5 +1,5 @@
+import type { AccentHintProps, OutlineHintProps, StrokeProps } from '../keyboard';
 import { Suspense, use, useMemo } from 'react';
-import type { AccentHintProps, OutlineHintProps, StrokeProps } from '../stroke';
 import style from './style.module.scss';
 
 const chars: Array<Array<string>> = [

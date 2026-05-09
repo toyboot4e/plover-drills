@@ -1,10 +1,9 @@
 import type { Combobox } from '@base-ui/react/combobox';
+import { type AccentHintProps, getKeyboard, type KeyboardName, type OutlineHintProps } from './keyboard';
 import { useMemo, useState } from 'react';
 import styles from './App.module.scss';
 import { MyCheckbox } from './MyCheckbox.tsx';
 import { MyCombobox, type MyComboboxItem } from './MyCombobox.tsx';
-import type { AccentHintProps, KeyboardName, OutlineHintProps } from './stroke';
-import { getKeyboard } from './stroke';
 import './theme.css';
 import { createDrillDataIndex, Drill, type DrillData, type DrillProps, type MatchWord } from './Drill';
 import { getSystem, type System, type SystemName, systemNames } from './system';

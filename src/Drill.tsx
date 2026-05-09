@@ -1,6 +1,6 @@
+import type { AccentHintProps, OutlineHintProps } from './keyboard';
 import { useReducer } from 'react';
 import styles from './Drill.module.scss';
-import type { AccentHintProps, OutlineHintProps } from './stroke';
 import './theme.css';
 import { shuffleArray, useDebouncedCallback, useLocalStorage } from './utils';
 

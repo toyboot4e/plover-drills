@@ -1,4 +1,4 @@
-import type { AccentHintProps, OutlineHintProps, StrokeProps } from '../stroke';
+import type { AccentHintProps, OutlineHintProps, StrokeProps } from '../keyboard';
 import style from './style.module.scss';
 
 const chars: Array<Array<string>> = [
