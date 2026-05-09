@@ -1,7 +1,7 @@
 // word -> translations of prefixes of outlines
 
-import wordMapData from '../generated/Lapwing.json' with { type: 'json' };
 import type { DrillData } from '../Drill';
+import wordMapData from '../generated/Lapwing.json' with { type: 'json' };
 import * as uni from '../stroke/uniV4';
 import type { System } from '../system';
 import { generateDrills } from './utils';
@@ -43,6 +43,7 @@ const Footer = (props: React.HTMLAttributes<HTMLElement>): React.JSX.Element => 
 export const lapwingSystem: System = {
   matchWord,
   drillFiles,
+  keyboards: ['UniV4'],
   Footer,
   Stroke: uni.Stroke,
   OutlineHint: uni.OutlineHint,

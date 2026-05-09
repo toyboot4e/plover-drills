@@ -148,6 +148,20 @@ const AppImpl = ({
     localStorage.removeItem(drillItemIndexKey);
   };
 
+  const [keyboard, _setKeyboard] = useLocalStorage<string>(
+    localStorageKey(systemName, 'keyboard'),
+    (kbd) => (kbd && system.keyboards.find((k) => k === kbd)) || system.keyboards[0],
+    id,
+  );
+
+  const keyboardItems = useMemo(() => {
+    return system.keyboards.map((kbd) => ({
+      key: kbd,
+      label: kbd,
+    }));
+  }, [system]);
+  const [defaultKeyboard] = useState(() => keyboardItems.find(({ key }) => key === keyboard) || keyboardItems[0]);
+
   return (
     <>
       <h1 className={styles.header}>Plove Drills</h1>
@@ -159,6 +173,16 @@ const AppImpl = ({
           defaultValue={defaultSystemItem}
           placeholder={'System'}
           onValueChange={onSystemChange}
+        />
+        <p className={styles.checkboxContainer} style={{ display: 'flex' }}>
+          Choose your keyboard
+        </p>
+        <MyCombobox
+          items={keyboardItems}
+          placeholder='Keyboard'
+          width='100%'
+          defaultValue={defaultKeyboard}
+          onValueChange={(_) => {}}
         />
         <p className={styles.checkboxContainer} style={{ display: 'flex' }}>
           Choose your drill

@@ -1,4 +1,5 @@
 import type { DrillData, MatchWord } from './Drill';
+import type { Keyboard } from './keyboard';
 import type { AccentHintProps, OutlineHintProps, StrokeProps } from './stroke';
 import { lapwingSystem } from './system/lapwing';
 import { mejiroSystem } from './system/mejiro';
@@ -13,6 +14,7 @@ export const systemNames: Array<SystemName> = ['lapwing', 'mejiro'];
 export type System = {
   matchWord: MatchWord;
   drillFiles: Array<{ name: string; drillData: DrillData }>;
+  keyboards: Keyboard[];
   Footer: (props: React.HTMLAttributes<HTMLElement>) => React.JSX.Element;
   Stroke: (props: StrokeProps) => React.JSX.Element;
   OutlineHint: (props: OutlineHintProps) => React.JSX.Element;

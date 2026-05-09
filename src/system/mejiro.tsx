@@ -31,6 +31,7 @@ const Footer = (props: React.HTMLAttributes<HTMLElement>): React.JSX.Element => 
 export const mejiroSystem: System = {
   matchWord,
   drillFiles,
+  keyboards: ['Mejiro31'],
   Footer,
   Stroke: mejiro31.Stroke,
   OutlineHint: mejiro31.OutlineHint,
