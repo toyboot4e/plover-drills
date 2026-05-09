@@ -26,6 +26,9 @@ jobs:
     - name: Run npm install
       shell: "bash"
       run: npm install
+    - name: Run check
+      shell: "bash"
+      run: npm run check
     - name: Build Plover Drills
       shell: "bash"
       run: npm run build
