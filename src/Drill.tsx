@@ -128,7 +128,7 @@ export const Drill = ({
   const onChangeDebounced = useDebouncedCallback((text: string) => {
     if (text.trim() === expected) {
       dispatchState({ type: 'NEXT', length: drillData.length });
-    } else if (!matchWord(expected, text.trim())) {
+    } else if (text.trim() !== '' && !matchWord(expected, text.trim())) {
       dispatchState({ type: 'FAIL' });
     }
   }, 100); // 100ms delay
