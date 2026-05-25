@@ -99,6 +99,7 @@ export type DrillProps = {
   drillDataIndex: Array<number>;
   drillItemIndexKey: string;
   alwaysShowKeyboard: boolean;
+  alwaysShowOutline: boolean;
   matchWord: MatchWord;
   OutlineHint: (props: OutlineHintProps) => React.JSX.Element;
   AccentHint: (props: AccentHintProps) => React.JSX.Element | null;
