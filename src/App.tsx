@@ -18,6 +18,7 @@ const DrillLoader = ({
   shuffleSeed,
   drillItemIndexKey,
   alwaysShowKeyboard,
+  alwaysShowOutline,
   showAccentHint,
   system,
   keyboard,
@@ -28,6 +29,7 @@ const DrillLoader = ({
   shuffleSeed: number;
   drillItemIndexKey: string;
   alwaysShowKeyboard: boolean;
+  alwaysShowOutline: boolean;
   showAccentHint: boolean;
   system: System;
   keyboard: Keyboard;
@@ -39,6 +41,7 @@ const DrillLoader = ({
       drillDataIndex={createDrillDataIndex(drillData.length, shuffle, shuffleSeed)}
       drillItemIndexKey={drillItemIndexKey}
       alwaysShowKeyboard={alwaysShowKeyboard}
+      alwaysShowOutline={alwaysShowOutline}
       matchWord={system.matchWord}
       OutlineHint={keyboard.OutlineHint}
       AccentHint={keyboard.AccentHint}
@@ -96,6 +99,13 @@ const AppImpl = ({
     String,
   );
   const [defaultAlwaysShowKeyboard] = useState(() => alwaysShowKeyboard);
+
+  const [alwaysShowOutline, setAlwaysShowOutline] = useLocalStorage<boolean>(
+    localStorageKey(systemName, 'always-show-outline'),
+    (v) => v === 'true',
+    String,
+  );
+  const [defaultAlwaysShowOutline] = useState(() => alwaysShowOutline);
 
   const [showAccentHint, setShowAccentHint] = useLocalStorage<boolean>(
     localStorageKey(systemName, 'show-accent-hint'),
@@ -217,6 +227,14 @@ const AppImpl = ({
               }}
             />
             <MyCheckbox
+              title='Always show stroke yint'
+              checked={alwaysShowOutline}
+              defaultChecked={defaultAlwaysShowOutline}
+              onCheckedChange={(alwaysShowOutlineHint, _) => {
+                setAlwaysShowOutline(alwaysShowOutlineHint);
+              }}
+            />
+            <MyCheckbox
               title='Accent hint'
               checked={showAccentHint}
               defaultChecked={defaultShowAccentHint}
@@ -235,6 +253,7 @@ const AppImpl = ({
               shuffleSeed={shuffleSeed}
               drillItemIndexKey={drillItemIndexKey}
               alwaysShowKeyboard={alwaysShowKeyboard}
+              alwaysShowOutline={alwaysShowOutline}
               showAccentHint={showAccentHint}
               system={system}
               keyboard={keyboard}

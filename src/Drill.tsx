@@ -110,6 +110,7 @@ export const Drill = ({
   drillDataIndex,
   drillItemIndexKey,
   alwaysShowKeyboard,
+  alwaysShowOutline,
   matchWord,
   OutlineHint,
   AccentHint,
@@ -192,7 +193,9 @@ export const Drill = ({
         </p>
         {/* biome-ignore lint/a11y/noAutofocus: ignore */}
         <input className={styles.editor} value={state.text} placeholder='Type here' autoFocus onChange={onChange} />
-        {(state.fail || alwaysShowKeyboard) && <OutlineHint outline={state.fail ? item.outline : ['']} />}
+        {(state.fail || alwaysShowKeyboard || alwaysShowOutline) && (
+          <OutlineHint outline={alwaysShowOutline || state.fail ? item.outline : ['']} />
+        )}
       </>
     );
   } else {
