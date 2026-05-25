@@ -15,6 +15,7 @@ const chars: Array<Array<string>> = [
 // 3         t k   k t
 
 const stenoOrder = [
+  // Left hand side
   [0, 0], //   0 #
   [0, 1], //   1 S
   [0, 2], //   2 T
@@ -27,6 +28,20 @@ const stenoOrder = [
   [2, 4], //   9 n
   [3, 4], //   9 t
   [3, 5], //  10 k
+
+  // Right hand side (reversed: right to left)
+  [0, 12], // 11 *
+  [0, 11], // 12 S
+  [0, 10], // 13 T
+  [1, 10], // 14 K
+  [0, 9], //  15 Y
+  [1, 9], //  16 N
+  [0, 8], //  17 I
+  [1, 8], //  18 A
+  [0, 7], //  19 U
+  [2, 8], //  20 n
+  [3, 8], //  21 t
+  [3, 7], //  22 k
 ];
 
 const collectKeyPress = (chars: Array<Array<string>>, stroke: string): Array<Array<boolean>> => {
