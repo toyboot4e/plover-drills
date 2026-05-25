@@ -1,20 +1,20 @@
-タイプ：TY-STKU
-フェイス：STKNYIA-SU
-キング：KIn-KNU
-オクラ：AUk-STA
-ファクト：STKNAk-TAU
-キャット：KYAtk-TAU
-ベッド：TKNIAtk-TNAU
-ショップ：SYAUtk-STKU
-スイッチ：SIUtk-TI
-ニュース：NYUntk-SU
-ゲーム：KNIAntk-SKNU
-シューズ：SYUntk-SNU
-ミラー：SKNI-STAntk
-メニュー：SKNIA-NYUntk
-ライター：STY-TAntk
-コーヒー：KAUntk-TKIntk
-シャーペン：SYAntk-STKIAn
-サーフィン：SAntk-STKNIn
-ウィンター：SKIn-TAntk
-ピクチャー：STKIk-TYAntk
+タイプ	TY-STKU
+フェイス	STKNYIA-SU
+キング	KIn-KNU
+オクラ	AUk-STA
+ファクト	STKNAk-TAU
+キャット	KYAtk-TAU
+ベッド	TKNIAtk-TNAU
+ショップ	SYAUtk-STKU
+スイッチ	SIUtk-TI
+ニュース	NYUntk-SU
+ゲーム	KNIAntk-SKNU
+シューズ	SYUntk-SNU
+ミラー	SKNI-STAntk
+メニュー	SKNIA-NYUntk
+ライター	STY-TAntk
+コーヒー	KAUntk-TKIntk
+シャーペン	SYAntk-STKIAn
+サーフィン	SAntk-STKNIn
+ウィンター	SKIn-TAntk
+ピクチャー	STKIk-TYAntk
