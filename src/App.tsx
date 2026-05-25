@@ -227,7 +227,7 @@ const AppImpl = ({
               }}
             />
             <MyCheckbox
-              title='Always show stroke yint'
+              title='Always show stroke'
               checked={alwaysShowOutline}
               defaultChecked={defaultAlwaysShowOutline}
               onCheckedChange={(alwaysShowOutlineHint, _) => {
