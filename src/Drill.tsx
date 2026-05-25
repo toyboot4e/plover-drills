@@ -140,7 +140,13 @@ export const Drill = ({
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const text = e.target.value;
     dispatchState({ type: 'SET_TEXT', text });
+    // Skip while the IME is composing
+    if ((e.nativeEvent as InputEvent).isComposing) return;
     onChangeDebounced(text);
+  };
+
+  const onCompositionEnd = (e: React.CompositionEvent<HTMLInputElement>) => {
+    onChangeDebounced(e.currentTarget.value);
   };
 
   const nextPrev = (
@@ -192,8 +198,15 @@ export const Drill = ({
           {showAccentHint && <AccentHint show={state.fail} word={expected} />}
           {nextPrev}
         </p>
-        {/* biome-ignore lint/a11y/noAutofocus: ignore */}
-        <input className={styles.editor} value={state.text} placeholder='Type here' autoFocus onChange={onChange} />
+        <input
+          className={styles.editor}
+          value={state.text}
+          placeholder='Type here'
+          // biome-ignore lint/a11y/noAutofocus: ignore
+          autoFocus
+          onChange={onChange}
+          onCompositionEnd={onCompositionEnd}
+        />
         {(state.fail || alwaysShowKeyboard || alwaysShowOutline) && (
           <OutlineHint outline={alwaysShowOutline || state.fail ? item.outline : ['']} />
         )}
