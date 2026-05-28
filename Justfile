@@ -49,3 +49,11 @@ alias c := check
 # updates dependencies aggressively
 update:
     npx npm-check-updates -u && npm install
+
+# check CI files
+ci-check:
+    zizmor .
+
+# check CI files
+ci-check-fix:
+    zizmor . --fix=all # TODO: pinact
