@@ -186,7 +186,7 @@ export const Drill = ({
   );
 
   const nextPrev = (
-    <span className={styles.nextPrev}>
+    <span className={styles.right}>
       <button
         type='button'
         aria-label='Previous'
@@ -226,55 +226,52 @@ export const Drill = ({
     </span>
   );
 
-  if (!state.isCompleted) {
-    return (
-      <>
-        <p className={styles.lessonStatus}>
-          <span className={styles.count}>
-            [{state.drillItemIndex + 1} / {drillData.length}]
-          </span>
-          <span className={styles.comboboxSpan}>{itemCombobox}</span>
-          {showAccentHint && <AccentHint show={state.fail} word={expected} />}
-          {nextPrev}
-        </p>
-        <input
-          className={styles.editor}
-          value={state.text}
-          placeholder='Type here'
-          // biome-ignore lint/a11y/noAutofocus: ignore
-          autoFocus
-          onChange={onChange}
-          onCompositionEnd={onCompositionEnd}
-        />
-        {(state.fail || alwaysShowKeyboard || alwaysShowOutline) && (
-          <OutlineHint outline={alwaysShowOutline || state.fail ? item.outline : ['']} />
-        )}
-      </>
-    );
-  } else {
-    return (
+  return (
+    <>
       <p className={styles.lessonStatus}>
         <span className={styles.count}>
-          [{drillData.length} / {drillData.length}]
+          [{state.drillItemIndex + 1} / {drillData.length}]
         </span>
-        <span className={styles.comboboxSpan}>{itemCombobox}</span>{' '}
-        <svg
-          xmlns='http://www.w3.org/2000/svg'
-          width='16'
-          height='16'
-          viewBox='0 0 24 24'
-          fill='none'
-          stroke='green'
-          strokeWidth='3'
-          strokeLinecap='round'
-          strokeLinejoin='round'
-        >
-          <title>check</title>
-          <polyline points='20 6 9 17 4 12' />
-        </svg>
-        Completed!
+        <span className={styles.comboboxSpan}>{itemCombobox}</span>
+        {showAccentHint && <AccentHint show={state.fail} word={expected} />}
         {nextPrev}
       </p>
-    );
-  }
+      {!state.isCompleted ? (
+        // typing
+        <>
+          <input
+            className={styles.editor}
+            value={state.text}
+            placeholder='Type here'
+            // biome-ignore lint/a11y/noAutofocus: ignore
+            autoFocus
+            onChange={onChange}
+            onCompositionEnd={onCompositionEnd}
+          />
+          {(state.fail || alwaysShowKeyboard || alwaysShowOutline) && (
+            <OutlineHint outline={alwaysShowOutline || state.fail ? item.outline : ['']} />
+          )}
+        </>
+      ) : (
+        // completed
+        <p>
+          <svg
+            xmlns='http://www.w3.org/2000/svg'
+            width='16'
+            height='16'
+            viewBox='0 0 24 24'
+            fill='none'
+            stroke='green'
+            strokeWidth='3'
+            strokeLinecap='round'
+            strokeLinejoin='round'
+          >
+            <title>check</title>
+            <polyline points='20 6 9 17 4 12' />
+          </svg>
+          Completed!
+        </p>
+      )}
+    </>
+  );
 };
