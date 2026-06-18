@@ -31,7 +31,6 @@ dev:
 [private]
 alias d := dev
 
-# runs biome check --fix
 # runs npm run build
 build:
     npm run build
@@ -39,9 +38,9 @@ build:
 [private]
 alias b := build
 
-# runs biome check --fix
+# runs biome check write
 check:
-    npm run check:fix
+    npm run check:write
 
 [private]
 alias c := check

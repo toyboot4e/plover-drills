@@ -6,12 +6,13 @@
   "scripts": {
     "build": "tsc -b && vite build",
     "check": "biome check",
-    "check:fix": "biome check --fix --format-with-errors true",
+    "check:write": "biome check --write --format-with-errors true",
+    "check:write:unsafe": "biome check --write --unsafe --format-with-errors true",
     "dev": "vite",
     "format": "biome format",
-    "format:fix": "biome format --fix",
+    "format:write": "biome format --write",
     "lint": "biome lint",
-    "lint:fix": "biome lint --fix",
+    "lint:write": "biome lint --write",
     "preview": "vite preview"
   },
   "dependencies": {
