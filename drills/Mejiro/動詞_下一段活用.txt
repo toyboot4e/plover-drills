@@ -1,0 +1,35 @@
+気を付ける	KI-SKAU
+助ける	T-KIA
+続ける	TN-KIA
+
+掲げる	K-KNIA
+
+合わせる	A-SKA
+任せる	SKNA-KA
+
+出る	TN-
+
+比べる	KU-STA
+調べる	SI-STA
+
+定める	SA-TNA
+確かめる	TA-SI
+始める	TKA-SNI
+求める	SKNAU-TAU
+
+埋もれる	U-SKNAU
+壊れる	KAU-STIA
+流れる	NA-KNA
+外れる	TKA-SNU
+忘れる	SKA-SU
+
+抑える	AU-SA
+教える	AU-SI
+覚える	AU-TKNAU
+考える	KA-KNA
+考える	KA-
+鍛える	KI-TA
+加える	KU-SKA
+答える	KAU-TA
+支える	SA-SA
+間違える	SKNA-KNA

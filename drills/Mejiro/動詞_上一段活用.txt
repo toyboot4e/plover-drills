@@ -1,0 +1,7 @@
+演じる	IA-SNI
+感じる	KA-SNI
+禁じる	KI-SNI
+信じる	SI-SNI
+断じる	TNA-SNI
+
+鑑みる	KA-SKNI
