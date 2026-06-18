@@ -6,6 +6,7 @@ const parseDrillData = (text: string): DrillData =>
   text
     .trim()
     .split('\n')
+    .filter((line) => !(line.startsWith('#') || line.trim() === ''))
     .map((line) => {
       const columns = line.split('\t');
       return {
