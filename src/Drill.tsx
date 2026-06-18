@@ -1,6 +1,7 @@
-import { useReducer } from 'react';
+import { useMemo, useReducer } from 'react';
 import styles from './Drill.module.scss';
 import type { AccentHintProps, OutlineHintProps } from './keyboard/types';
+import { MyCombobox } from './MyCombobox';
 import './theme.css';
 import { shuffleArray, useDebouncedCallback, useLocalStorage } from './utils';
 
@@ -23,7 +24,8 @@ export type Action =
   | { type: 'SET_TEXT'; text: string }
   | { type: 'FAIL' }
   | { type: 'NEXT'; length: number }
-  | { type: 'PREV'; length: number };
+  | { type: 'PREV'; length: number }
+  | { type: 'SELECT'; index: number };
 
 const createInitialDrillState = (drillItemIndex: number, setDrillItemIndex: (i: number) => void): DrillState => {
   return {
@@ -45,6 +47,15 @@ const reduceDrillStateImpl = (state: DrillState, action: Action): DrillState => 
   switch (action.type) {
     case 'SET_TEXT':
       return { ...state, text: action.text };
+
+    case 'SELECT':
+      return {
+        text: '',
+        fail: false,
+        drillItemIndex: action.index,
+        setDrillItemIndex: state.setDrillItemIndex,
+        isCompleted: false,
+      };
 
     case 'FAIL':
       return { ...state, fail: true };
@@ -149,8 +160,33 @@ export const Drill = ({
     onChangeDebounced(e.currentTarget.value);
   };
 
+  const comboboxItems = useMemo(
+    () =>
+      drillDataIndex.map((dataIndex, pos) => ({
+        key: String(pos),
+        label: `${pos + 1} - ${drillData[dataIndex]?.word.trim() ?? ''}`,
+      })),
+    [drillData, drillDataIndex],
+  );
+
+  const itemCombobox = (
+    <MyCombobox
+      key={state.drillItemIndex}
+      items={comboboxItems}
+      width='100%'
+      placeholder='Drill item'
+      defaultValue={comboboxItems[state.drillItemIndex] ?? null}
+      allowClear={false}
+      onValueChange={(item) => {
+        if (item !== null) {
+          dispatchState({ type: 'SELECT', index: Number(item.key) });
+        }
+      }}
+    />
+  );
+
   const nextPrev = (
-    <span className={styles.right}>
+    <span className={styles.nextPrev}>
       <button
         type='button'
         aria-label='Previous'
@@ -194,7 +230,10 @@ export const Drill = ({
     return (
       <>
         <p className={styles.lessonStatus}>
-          [{state.drillItemIndex + 1} / {drillData.length}] {expected}
+          <span className={styles.count}>
+            [{state.drillItemIndex + 1} / {drillData.length}]
+          </span>
+          <span className={styles.comboboxSpan}>{itemCombobox}</span>
           {showAccentHint && <AccentHint show={state.fail} word={expected} />}
           {nextPrev}
         </p>
@@ -215,7 +254,10 @@ export const Drill = ({
   } else {
     return (
       <p className={styles.lessonStatus}>
-        [{drillData.length} / {drillData.length}]{' '}
+        <span className={styles.count}>
+          [{drillData.length} / {drillData.length}]
+        </span>
+        <span className={styles.comboboxSpan}>{itemCombobox}</span>{' '}
         <svg
           xmlns='http://www.w3.org/2000/svg'
           width='16'

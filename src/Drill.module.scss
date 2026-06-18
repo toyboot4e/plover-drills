@@ -1,10 +1,16 @@
 .lessonStatus {
   display: flex;
-  align-items: 'center';
+  align-items: center;
+  gap: 0.5rem;
 }
 
-.right {
-  margin-left: auto;
+.comboboxSpan {
+  flex: 1;
+}
+
+.nextPrev {
+  display: inline-flex;
+  gap: 0.25rem;
 }
 
 // TODO: extend combobox's input instead
