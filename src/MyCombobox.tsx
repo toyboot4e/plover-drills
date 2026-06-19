@@ -13,7 +13,7 @@ export type MyComboboxProps<T extends MyComboboxItem> = {
   placeholder?: string;
   emptyString?: string;
   width: string;
-  defaultValue: T | null;
+  value: T | null;
   onValueChange?: (value: T | null, eventDetails: Combobox.Root.ChangeEventDetails) => void;
   allowClear?: boolean;
 };
@@ -26,13 +26,18 @@ export const MyCombobox = <T extends MyComboboxItem>({
   placeholder,
   emptyString,
   width,
-  defaultValue,
+  value,
   onValueChange,
   allowClear,
 }: MyComboboxProps<T>): React.JSX.Element => {
   const id = React.useId();
   return (
-    <Combobox.Root items={items} defaultValue={defaultValue} onValueChange={onValueChange}>
+    <Combobox.Root
+      items={items}
+      isItemEqualToValue={(a, b) => a?.key === b?.key}
+      value={value}
+      onValueChange={onValueChange}
+    >
       <div className={styles.Label} style={{ width }}>
         <div className={styles.InputWrapper}>
           <Combobox.Input placeholder={placeholder} id={id} className={styles.Input} style={{ width }} />

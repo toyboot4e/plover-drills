@@ -78,8 +78,6 @@ const AppImpl = ({
   systemName: SystemName;
   setSystemName: (systemName: SystemName) => void;
 }): React.JSX.Element => {
-  const [defaultSystemItem] = useState(() => systemItems.find(({ key }) => key === systemName) || systemItems[0]);
-
   const [shuffle, setShuffle] = useLocalStorage<boolean>(
     localStorageKey(systemName, 'shuffle'),
     (v) => v === 'true',
@@ -141,22 +139,23 @@ const AppImpl = ({
       label: kbd,
     }));
   }, [system]);
-  const [defaultKeyboard] = useState(() => keyboardItems.find(({ key }) => key === keyboardName) || keyboardItems[0]);
+  const keyboardValue = useMemo(
+    () => keyboardItems.find(({ key }) => key === keyboardName) ?? null,
+    [keyboardItems, keyboardName],
+  );
 
   const comboboxDrillItems = useMemo(() => {
     return system.drillFiles.map(({ name }) => ({ key: name, label: name }));
   }, [system]);
+  const drillValue = useMemo(
+    () => comboboxDrillItems.find(({ key }) => key === filename) ?? null,
+    [comboboxDrillItems, filename],
+  );
 
   const drillFile = useMemo<DrillFile | null>(
     () => (typeof filename === 'string' ? system.drillFiles.find((d) => d.name === filename) || null : null),
     [system, filename],
   );
-
-  const defaultDrillItem = useMemo(
-    () => (drillFile ? comboboxDrillItems.find((d) => d.key === drillFile.name) || null : null),
-    [comboboxDrillItems, drillFile],
-  );
-  const [defaultDrill] = useState(() => defaultDrillItem);
 
   const drillItemIndexKey = localStorageKey(systemName, 'drill-item-index');
 
@@ -179,7 +178,7 @@ const AppImpl = ({
           <MyCombobox
             items={systemItems}
             width='100%'
-            defaultValue={defaultSystemItem}
+            value={systemItems.find(({ key }) => key === systemName) ?? null}
             placeholder={'System'}
             onValueChange={onSystemChange}
             allowClear={false}
@@ -189,7 +188,7 @@ const AppImpl = ({
             items={keyboardItems}
             placeholder='Keyboard'
             width='100%'
-            defaultValue={defaultKeyboard}
+            value={keyboardValue}
             onValueChange={(item) => {
               // TODO: forbid null
               if (item !== null) {
@@ -204,7 +203,7 @@ const AppImpl = ({
             placeholder='Drill'
             emptyString='No drill found'
             width='100%'
-            defaultValue={defaultDrill}
+            value={drillValue}
             onValueChange={onChangeDrill}
             allowClear={false}
           />

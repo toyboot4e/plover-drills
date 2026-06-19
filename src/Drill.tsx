@@ -171,11 +171,10 @@ export const Drill = ({
 
   const itemCombobox = (
     <MyCombobox
-      key={state.drillItemIndex}
       items={comboboxItems}
       width='100%'
       placeholder='Drill item'
-      defaultValue={comboboxItems[state.drillItemIndex] ?? null}
+      value={comboboxItems[state.drillItemIndex] ?? null}
       allowClear={false}
       onValueChange={(item) => {
         if (item !== null) {
