@@ -60,10 +60,14 @@
               export LD_LIBRARY_PATH="${pkgs.libxkbcommon}/lib:$LD_LIBRARY_PATH"
               export LD_LIBRARY_PATH="${pkgs.freetype}/lib:$LD_LIBRARY_PATH"
               export LD_LIBRARY_PATH="${pkgs.dbus.lib}/lib:$LD_LIBRARY_PATH"
+            ''
+            # `evdev` (a `plover` dependency) compiles against the kernel
+            # headers; expose `linux/input.h` on the C include path so its
+            # `build_ecodes` step can find them.
+            + pkgs.lib.optionalString pkgs.stdenv.isLinux ''
+              export C_INCLUDE_PATH="${pkgs.linuxHeaders}/include:$C_INCLUDE_PATH"
+              export CPATH="${pkgs.linuxHeaders}/include:$CPATH"
             '';
-          }
-          // pkgs.lib.mkIf pkgs.stdenv.isLinux {
-            C_INCLUDE_PATH = "${pkgs.linuxHeaders}/include";
           };
       }
     );
