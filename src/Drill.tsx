@@ -175,6 +175,8 @@ export const Drill = ({
       width='100%'
       placeholder='Drill item'
       value={comboboxItems[state.drillItemIndex] ?? null}
+      // strip the number
+      itemToStringLabel={(item) => item.label.replace(/^\d+ - /, '')}
       allowClear={false}
       onValueChange={(item) => {
         if (item !== null) {

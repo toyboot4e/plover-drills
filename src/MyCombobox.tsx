@@ -16,6 +16,7 @@ export type MyComboboxProps<T extends MyComboboxItem> = {
   value: T | null;
   onValueChange?: (value: T | null, eventDetails: Combobox.Root.ChangeEventDetails) => void;
   allowClear?: boolean;
+  itemToStringLabel?: (item: T) => string;
 };
 
 /**
@@ -29,6 +30,7 @@ export const MyCombobox = <T extends MyComboboxItem>({
   value,
   onValueChange,
   allowClear,
+  itemToStringLabel,
 }: MyComboboxProps<T>): React.JSX.Element => {
   const id = React.useId();
   return (
@@ -37,6 +39,7 @@ export const MyCombobox = <T extends MyComboboxItem>({
       isItemEqualToValue={(a, b) => a?.key === b?.key}
       value={value}
       onValueChange={onValueChange}
+      itemToStringLabel={itemToStringLabel}
     >
       <div className={styles.Label} style={{ width }}>
         <div className={styles.InputWrapper}>
