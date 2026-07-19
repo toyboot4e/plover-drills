@@ -27,26 +27,14 @@
             pnpmDeps = pkgs.fetchPnpmDeps {
               inherit (finalAttrs) pname version src;
               fetcherVersion = 3;
-              hash = "sha256-RSQkfbqI1ahsrj7AkzBtiY7JXwtQQfCCxxBQLyxZ7Yc=";
+              hash = "sha256-oHMPBTlnnf237IWoDoD4DYflGNc4oiemLpiiPwkHLEM=";
             };
 
             nativeBuildInputs = with pkgs; [
               nodejs_24
               pnpm
               pnpmConfigHook
-              patchelf
             ];
-
-            # `sass-embedded` ships a prebuilt `dart` binary whose ELF interpreter
-            # (and libstdc++) are absent in the sandbox; point it at Nix's.
-            preBuild = ''
-              for dart in $(find node_modules/.pnpm -path '*/sass-embedded-linux-x64/dart-sass/src/dart'); do
-                patchelf \
-                  --set-interpreter "$(cat "$NIX_CC/nix-support/dynamic-linker")" \
-                  --set-rpath "${lib.makeLibraryPath [ pkgs.stdenv.cc.cc.lib ]}" \
-                  "$dart"
-              done
-            '';
 
             buildPhase = ''
               runHook preBuild
