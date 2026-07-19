@@ -26,28 +26,28 @@ alias gen := generate-drills-json
 
 # runs the app on dev srever at localhost:5173
 dev:
-    npm run dev "$@"
+    pnpm run dev "$@"
 
 [private]
 alias d := dev
 
-# runs npm run build
+# runs pnpm run build
 build:
-    npm run build
+    pnpm run build
 
 [private]
 alias b := build
 
 # runs biome check write
 check:
-    npm run check:write
+    pnpm run check:write
 
 [private]
 alias c := check
 
 # updates dependencies aggressively
 update:
-    npx npm-check-updates -u && npm install
+    pnpm dlx npm-check-updates -u && pnpm install
 
 # check CI files
 ci-check:
