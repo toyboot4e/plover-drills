@@ -22,6 +22,7 @@ const DrillLoader = ({
   showAccentHint,
   system,
   keyboard,
+  onRestart,
 }: {
   drillDataPromise: Promise<DrillData>;
   drillFile: DrillFile;
@@ -33,6 +34,7 @@ const DrillLoader = ({
   showAccentHint: boolean;
   system: System;
   keyboard: Keyboard;
+  onRestart: () => void;
 }): React.JSX.Element => {
   const drillData = use(drillDataPromise);
   return (
@@ -46,6 +48,7 @@ const DrillLoader = ({
       OutlineHint={keyboard.OutlineHint}
       AccentHint={keyboard.AccentHint}
       showAccentHint={showAccentHint}
+      onRestart={onRestart}
       key={drillFile.name}
     />
   );
@@ -257,6 +260,11 @@ const AppImpl = ({
               showAccentHint={showAccentHint}
               system={system}
               keyboard={keyboard}
+              onRestart={() => {
+                if (shuffle) {
+                  setShuffleSeed(Math.random());
+                }
+              }}
             />
           </Suspense>
         )}

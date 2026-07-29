@@ -115,6 +115,7 @@ export type DrillProps = {
   OutlineHint: (props: OutlineHintProps) => React.JSX.Element;
   AccentHint: (props: AccentHintProps) => React.JSX.Element | null;
   showAccentHint: boolean;
+  onRestart: () => void;
 };
 
 export const Drill = ({
@@ -127,6 +128,7 @@ export const Drill = ({
   OutlineHint,
   AccentHint,
   showAccentHint,
+  onRestart,
 }: DrillProps): React.JSX.Element => {
   const inits = useLocalStorage<number>(drillItemIndexKey, Number, String);
   const [state, dispatchState] = useReducer(reduceDrillState, inits, ([drillItemIndex, setDrillItemIndex]) => {
@@ -222,6 +224,36 @@ export const Drill = ({
             strokeLinecap='round'
             strokeLinejoin='round'
           />
+        </svg>
+      </button>
+      <button
+        type='button'
+        aria-label='Restart'
+        onClick={() => {
+          dispatchState({ type: 'SELECT', index: 0 });
+          onRestart();
+        }}
+      >
+        <svg width='24' height='24' viewBox='0 0 24 24' style={{ verticalAlign: 'middle' }} aria-hidden='true'>
+          <title>restart</title>
+          <g transform='translate(3.6 3.6) scale(0.7)'>
+            <path
+              d='M3.1 13.6a9 9 0 1 0 8.9-10.6 9.75 9.75 0 0 0-6.74 2.74L3 8'
+              fill='none'
+              stroke='currentColor'
+              strokeWidth='2.9'
+              strokeLinecap='round'
+              strokeLinejoin='round'
+            />
+            <path
+              d='M3 3v5h5'
+              fill='none'
+              stroke='currentColor'
+              strokeWidth='2.9'
+              strokeLinecap='round'
+              strokeLinejoin='round'
+            />
+          </g>
         </svg>
       </button>
     </span>
