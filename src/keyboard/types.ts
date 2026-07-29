@@ -1,4 +1,4 @@
-export type KeyboardName = 'UniV4' | 'Mejiro31';
+export type KeyboardName = 'UniV4' | 'Mejiro31' | 'Taipo';
 
 export type Keyboard = {
   Stroke: (props: StrokeProps) => React.JSX.Element;

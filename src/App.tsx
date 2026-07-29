@@ -56,6 +56,7 @@ const defaultSystemName: SystemName = 'lapwing';
 const systemItems: Array<MyComboboxItem> = [
   { key: 'lapwing', label: 'Lapwing' },
   { key: 'mejiro', label: 'Mejiro' },
+  { key: 'taipo', label: 'Taipo' },
 ];
 
 const localStorageKey = (system: SystemName, key: string): string => `plover-drills/${system}/${key}`;

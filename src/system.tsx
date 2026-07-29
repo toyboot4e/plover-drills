@@ -2,10 +2,11 @@ import type { DrillData, MatchWord } from './Drill';
 import type { KeyboardName } from './keyboard/types';
 import { lapwingSystem } from './system/lapwing';
 import { mejiroSystem } from './system/mejiro';
+import { taipoSystem } from './system/taipo';
 
-export type SystemName = 'lapwing' | 'mejiro';
+export type SystemName = 'lapwing' | 'mejiro' | 'taipo';
 
-export const systemNames: Array<SystemName> = ['lapwing', 'mejiro'];
+export const systemNames: Array<SystemName> = ['lapwing', 'mejiro', 'taipo'];
 
 /**
  * Each system's drill definition.
@@ -23,5 +24,7 @@ export const getSystem = (systemName: SystemName): System => {
       return lapwingSystem;
     case 'mejiro':
       return mejiroSystem;
+    case 'taipo':
+      return taipoSystem;
   }
 };

@@ -1,0 +1,14 @@
+sketch	-s/-k/-e/-t/-c/-h
+grand	-g/-r/-a/-n/-d
+quiz	-q/-u/-i/-z
+jump	-j/-u/-m/-p
+box	-b/-o/-x
+vow	-v/-o/-w
+fly	-f/-l/-y
+frozen	-f/-r/-o/-z/-e/-n
+quick	-q/-u/-i/-c/-k
+jump	-j/-u/-m/-p
+vast	-v/-a/-s/-t
+glad	-g/-l/-a/-d
+box	-b/-o/-x
+why	-w/-h/-y
