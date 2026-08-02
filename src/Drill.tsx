@@ -115,6 +115,7 @@ export type DrillProps = {
   OutlineHint: (props: OutlineHintProps) => React.JSX.Element;
   AccentHint: (props: AccentHintProps) => React.JSX.Element | null;
   showAccentHint: boolean;
+  loop: boolean;
   onRestart: () => void;
 };
 
@@ -128,6 +129,7 @@ export const Drill = ({
   OutlineHint,
   AccentHint,
   showAccentHint,
+  loop,
   onRestart,
 }: DrillProps): React.JSX.Element => {
   const inits = useLocalStorage<number>(drillItemIndexKey, Number, String);
@@ -142,9 +144,22 @@ export const Drill = ({
   const item = drillData[i]!;
   const expected = item.word.trim();
 
+  const restart = () => {
+    dispatchState({ type: 'SELECT', index: 0 });
+    onRestart();
+  };
+
+  const advance = () => {
+    if (loop && state.drillItemIndex + 1 >= drillData.length) {
+      restart();
+    } else {
+      dispatchState({ type: 'NEXT', length: drillData.length });
+    }
+  };
+
   const onChangeDebounced = useDebouncedCallback((text: string) => {
     if (text.trim() === expected) {
-      dispatchState({ type: 'NEXT', length: drillData.length });
+      advance();
     } else if (text.trim() !== '' && !matchWord(expected, text.trim())) {
       dispatchState({ type: 'FAIL' });
     }
@@ -208,12 +223,7 @@ export const Drill = ({
           />
         </svg>
       </button>
-      <button
-        type='button'
-        aria-label='Next'
-        onClick={() => dispatchState({ type: 'NEXT', length: drillData.length })}
-        disabled={state.isCompleted}
-      >
+      <button type='button' aria-label='Next' onClick={advance} disabled={state.isCompleted}>
         <svg width='24' height='24' viewBox='0 0 24 24' style={{ verticalAlign: 'middle' }} aria-hidden='true'>
           <title>next</title>
           <path
@@ -226,14 +236,7 @@ export const Drill = ({
           />
         </svg>
       </button>
-      <button
-        type='button'
-        aria-label='Restart'
-        onClick={() => {
-          dispatchState({ type: 'SELECT', index: 0 });
-          onRestart();
-        }}
-      >
+      <button type='button' aria-label='Restart' onClick={restart}>
         <svg width='24' height='24' viewBox='0 0 24 24' style={{ verticalAlign: 'middle' }} aria-hidden='true'>
           <title>restart</title>
           <g transform='translate(3.6 3.6) scale(0.7)'>

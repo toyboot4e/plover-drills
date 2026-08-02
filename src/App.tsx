@@ -22,6 +22,7 @@ const DrillLoader = ({
   showAccentHint,
   system,
   keyboard,
+  loop,
   onRestart,
 }: {
   drillDataPromise: Promise<DrillData>;
@@ -34,6 +35,7 @@ const DrillLoader = ({
   showAccentHint: boolean;
   system: System;
   keyboard: Keyboard;
+  loop: boolean;
   onRestart: () => void;
 }): React.JSX.Element => {
   const drillData = use(drillDataPromise);
@@ -48,6 +50,7 @@ const DrillLoader = ({
       OutlineHint={keyboard.OutlineHint}
       AccentHint={keyboard.AccentHint}
       showAccentHint={showAccentHint}
+      loop={loop}
       onRestart={onRestart}
       key={drillFile.name}
     />
@@ -108,6 +111,8 @@ const AppImpl = ({
     String,
   );
   const [defaultAlwaysShowOutline] = useState(() => alwaysShowOutline);
+
+  const [loop, setLoop] = useLocalStorage<boolean>(localStorageKey(systemName, 'loop'), (v) => v === 'true', String);
 
   const [showAccentHint, setShowAccentHint] = useLocalStorage<boolean>(
     localStorageKey(systemName, 'show-accent-hint'),
@@ -222,6 +227,14 @@ const AppImpl = ({
               }}
             />
             <MyCheckbox
+              title='Loop'
+              checked={loop}
+              defaultChecked={undefined}
+              onCheckedChange={(loop, _) => {
+                setLoop(loop);
+              }}
+            />
+            <MyCheckbox
               title='Always show keyboard'
               checked={alwaysShowKeyboard}
               defaultChecked={defaultAlwaysShowKeyboard}
@@ -260,6 +273,7 @@ const AppImpl = ({
               showAccentHint={showAccentHint}
               system={system}
               keyboard={keyboard}
+              loop={loop}
               onRestart={() => {
                 if (shuffle) {
                   setShuffleSeed(Math.random());
